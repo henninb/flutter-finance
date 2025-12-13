@@ -54,9 +54,10 @@ class AuthRepository {
           _logger.d('🍪 AuthRepository: Found ${cookies.length} cookies');
           // Look for token in cookies
           for (final cookie in cookies) {
-            _logger.d(
-              '🍪 AuthRepository: Cookie: ${cookie.substring(0, 50)}...',
-            );
+            final cookiePreview = cookie.length > 50
+                ? '${cookie.substring(0, 50)}...'
+                : cookie;
+            _logger.d('🍪 AuthRepository: Cookie: $cookiePreview');
             if (cookie.startsWith('token=')) {
               // Extract token value from cookie string
               final tokenStart = 'token='.length;
@@ -72,9 +73,12 @@ class AuthRepository {
         }
       }
 
-      _logger.d(
-        '🔑 AuthRepository: Extracted token: ${token.isEmpty ? "EMPTY" : "${token.substring(0, 20)}..."}',
-      );
+      final tokenPreview = token.isEmpty
+          ? "EMPTY"
+          : token.length > 20
+          ? '${token.substring(0, 20)}...'
+          : token;
+      _logger.d('🔑 AuthRepository: Extracted token: $tokenPreview');
 
       if (token.isEmpty) {
         _logger.e(
