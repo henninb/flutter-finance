@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../data_sources/remote/dio_provider.dart';
 import '../models/auth_token.dart';
+import '../models/csrf_token.dart';
 import '../models/login_request.dart';
 import '../models/user_model.dart';
 
@@ -153,6 +154,35 @@ class AuthRepository {
     } catch (e) {
       _logger.e('❌ AuthRepository: Unexpected error getting user info: $e');
       throw Exception('Failed to get user info: $e');
+    }
+  }
+
+  /// Fetch CSRF token from server
+  /// This endpoint is public and doesn't require authentication
+  Future<CsrfToken> fetchCsrfToken() async {
+    _logger.i('🔒 AuthRepository: Fetching CSRF token from /csrf');
+
+    try {
+      final response = await _dio.get('/csrf');
+      _logger.d('📥 AuthRepository: CSRF response: ${response.data}');
+
+      final csrfToken = CsrfToken.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ AuthRepository: CSRF token retrieved - Header: ${csrfToken.headerName}',
+      );
+
+      return csrfToken;
+    } on DioException catch (e) {
+      _logger.e('❌ AuthRepository: Failed to fetch CSRF token');
+      _logger.e('   Status code: ${e.response?.statusCode}');
+      _logger.e('   Response data: ${e.response?.data}');
+
+      throw Exception('Failed to fetch CSRF token: ${e.message}');
+    } catch (e) {
+      _logger.e('❌ AuthRepository: Unexpected error fetching CSRF token: $e');
+      throw Exception('Failed to fetch CSRF token: $e');
     }
   }
 }

@@ -52,6 +52,59 @@ class AuthInterceptor extends Interceptor {
   }
 }
 
+/// CSRF interceptor for adding CSRF token to mutation requests
+class CsrfInterceptor extends Interceptor {
+  final SecureStorageService _secureStorage;
+
+  CsrfInterceptor(this._secureStorage);
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    // Only add CSRF token for mutation requests (POST, PUT, DELETE, PATCH)
+    final isMutation = [
+      'POST',
+      'PUT',
+      'DELETE',
+      'PATCH',
+    ].contains(options.method.toUpperCase());
+
+    // Skip CSRF for login and register endpoints as they're exempt
+    final isExemptPath =
+        options.path.contains('/login') ||
+        options.path.contains('/register') ||
+        options.path.contains('/csrf');
+
+    if (isMutation && !isExemptPath) {
+      _logger.d(
+        '🔒 CsrfInterceptor: Intercepting ${options.method} request to ${options.uri}',
+      );
+
+      // Get CSRF token from secure storage
+      final csrfToken = await _secureStorage.getCsrfToken();
+
+      if (csrfToken != null) {
+        // Add CSRF token header
+        options.headers[csrfToken.headerName] = csrfToken.token;
+        _logger.i(
+          '✅ CsrfInterceptor: Added ${csrfToken.headerName} header to request: ${options.uri}',
+        );
+        _logger.d(
+          '🔑 CsrfInterceptor: Token (first 20 chars): ${csrfToken.token.substring(0, csrfToken.token.length > 20 ? 20 : csrfToken.token.length)}...',
+        );
+      } else {
+        _logger.w(
+          '⚠️ CsrfInterceptor: No CSRF token available for mutation request: ${options.uri}',
+        );
+      }
+    }
+
+    return handler.next(options);
+  }
+}
+
 /// Dio provider for HTTP requests
 final dioProvider = Provider<Dio>((ref) {
   final secureStorage = ref.watch(secureStorageServiceProvider);
@@ -75,6 +128,11 @@ final dioProvider = Provider<Dio>((ref) {
 
   // Add auth interceptor (for Bearer token fallback)
   dio.interceptors.add(AuthInterceptor(secureStorage));
+  _logger.i('🔐 Dio: Auth interceptor added');
+
+  // Add CSRF interceptor (for CSRF protection on mutations)
+  dio.interceptors.add(CsrfInterceptor(secureStorage));
+  _logger.i('🔒 Dio: CSRF interceptor added');
 
   // Add logging interceptor in development
   if (EnvConfig.enableLogging) {
@@ -120,6 +178,13 @@ final dioProvider = Provider<Dio>((ref) {
         if (error.response?.statusCode == 401) {
           _logger.w('⚠️ Unauthorized (401) - clearing expired token');
           await secureStorage.clearAuthToken();
+          await secureStorage.clearCsrfToken();
+        }
+
+        // Handle 403 forbidden (might be CSRF token issue)
+        if (error.response?.statusCode == 403) {
+          _logger.w('⚠️ Forbidden (403) - might be CSRF token issue');
+          _logger.w('   Consider refreshing CSRF token');
         }
 
         return handler.next(error);

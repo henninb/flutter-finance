@@ -65,6 +65,22 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = await _secureStorage.getAuthToken();
         if (token != null) {
           _logger.i('✅ AuthNotifier: Valid token found, fetching user info');
+
+          // Check if we have a CSRF token, if not fetch it
+          final csrfToken = await _secureStorage.getCsrfToken();
+          if (csrfToken == null) {
+            _logger.d('🔒 AuthNotifier: No CSRF token found, fetching...');
+            try {
+              final newCsrfToken = await _authRepository.fetchCsrfToken();
+              await _secureStorage.saveCsrfToken(newCsrfToken);
+              _logger.i('✅ AuthNotifier: CSRF token fetched and saved');
+            } catch (csrfError) {
+              _logger.w(
+                '⚠️ AuthNotifier: Failed to fetch CSRF token on startup: $csrfError',
+              );
+            }
+          }
+
           // Set token in dio headers (this will be done via interceptor)
           final user = await _authRepository.getCurrentUser();
           state = AuthState(
@@ -101,6 +117,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.d('💾 AuthNotifier: Saving token to secure storage');
       await _secureStorage.saveAuthToken(authToken);
 
+      // Fetch CSRF token after successful login
+      _logger.d('🔒 AuthNotifier: Fetching CSRF token');
+      try {
+        final csrfToken = await _authRepository.fetchCsrfToken();
+        await _secureStorage.saveCsrfToken(csrfToken);
+        _logger.i('✅ AuthNotifier: CSRF token saved successfully');
+      } catch (csrfError) {
+        _logger.w('⚠️ AuthNotifier: Failed to fetch CSRF token: $csrfError');
+        // Continue with login even if CSRF fetch fails
+        // The interceptor will retry fetching it when needed
+      }
+
       // Get user information
       _logger.d('👤 AuthNotifier: Fetching user information');
       final user = await _authRepository.getCurrentUser();
@@ -132,6 +160,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       // Continue with logout even if API call fails
     } finally {
       await _secureStorage.clearAuthToken();
+      await _secureStorage.clearCsrfToken();
       state = const AuthState(isLoading: false);
       _logger.i('✅ AuthNotifier: Logout complete');
     }
