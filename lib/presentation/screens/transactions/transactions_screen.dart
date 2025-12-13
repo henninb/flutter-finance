@@ -12,14 +12,13 @@ import '../../widgets/edit_transaction_dialog.dart';
 class TransactionsScreen extends ConsumerWidget {
   final Account account;
 
-  const TransactionsScreen({
-    super.key,
-    required this.account,
-  });
+  const TransactionsScreen({super.key, required this.account});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transactionsState = ref.watch(transactionsProvider(account.accountNameOwner));
+    final transactionsState = ref.watch(
+      transactionsProvider(account.accountNameOwner),
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -29,23 +28,25 @@ class TransactionsScreen extends ConsumerWidget {
             Text(Formatters.formatAccountName(account.accountNameOwner)),
             Text(
               account.accountType.toUpperCase(),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(transactionsProvider(account.accountNameOwner).notifier).refresh();
+          await ref
+              .read(transactionsProvider(account.accountNameOwner).notifier)
+              .refresh();
           ref.invalidate(transactionTotalsProvider(account.accountNameOwner));
         },
         child: transactionsState.isLoading
             ? const Center(child: CircularProgressIndicator())
             : transactionsState.errorMessage != null
-                ? _buildErrorView(context, ref, transactionsState.errorMessage!)
-                : _buildTransactionsList(context, ref, transactionsState),
+            ? _buildErrorView(context, ref, transactionsState.errorMessage!)
+            : _buildTransactionsList(context, ref, transactionsState),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -83,7 +84,9 @@ class TransactionsScreen extends ConsumerWidget {
             itemCount: paginatedTransactions.length + 1, // +1 for totals card
             itemBuilder: (context, index) {
               if (index == 0) {
-                return TransactionTotalsCard(accountNameOwner: account.accountNameOwner);
+                return TransactionTotalsCard(
+                  accountNameOwner: account.accountNameOwner,
+                );
               }
 
               final transaction = paginatedTransactions[index - 1];
@@ -107,8 +110,10 @@ class TransactionsScreen extends ConsumerWidget {
     final hasNextPage = transactionsState.hasNextPage;
     final hasPreviousPage = transactionsState.hasPreviousPage;
     final startIndex = currentPage * transactionsState.pageSize + 1;
-    final endIndex = ((currentPage + 1) * transactionsState.pageSize)
-        .clamp(0, transactionsState.allTransactions.length);
+    final endIndex = ((currentPage + 1) * transactionsState.pageSize).clamp(
+      0,
+      transactionsState.allTransactions.length,
+    );
     final totalTransactions = transactionsState.allTransactions.length;
 
     return Container(
@@ -128,9 +133,9 @@ class TransactionsScreen extends ConsumerWidget {
           // Page info
           Text(
             'Showing $startIndex-$endIndex of $totalTransactions transactions',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 12),
           // Navigation buttons
@@ -140,7 +145,13 @@ class TransactionsScreen extends ConsumerWidget {
               // Previous button
               IconButton(
                 onPressed: hasPreviousPage
-                    ? () => ref.read(transactionsProvider(account.accountNameOwner).notifier).previousPage()
+                    ? () => ref
+                          .read(
+                            transactionsProvider(
+                              account.accountNameOwner,
+                            ).notifier,
+                          )
+                          .previousPage()
                     : null,
                 icon: const Icon(Icons.chevron_left),
                 tooltip: 'Previous page',
@@ -148,7 +159,10 @@ class TransactionsScreen extends ConsumerWidget {
               const SizedBox(width: 16),
               // Page indicator
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
@@ -156,16 +170,22 @@ class TransactionsScreen extends ConsumerWidget {
                 child: Text(
                   'Page ${currentPage + 1} of $totalPages',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(width: 16),
               // Next button
               IconButton(
                 onPressed: hasNextPage
-                    ? () => ref.read(transactionsProvider(account.accountNameOwner).notifier).nextPage()
+                    ? () => ref
+                          .read(
+                            transactionsProvider(
+                              account.accountNameOwner,
+                            ).notifier,
+                          )
+                          .nextPage()
                     : null,
                 icon: const Icon(Icons.chevron_right),
                 tooltip: 'Next page',
@@ -205,9 +225,9 @@ class TransactionsScreen extends ConsumerWidget {
         title: Text(
           transaction.description,
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,9 +235,9 @@ class TransactionsScreen extends ConsumerWidget {
             const SizedBox(height: 4),
             Text(
               transaction.category,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: 2),
             Row(
@@ -231,23 +251,28 @@ class TransactionsScreen extends ConsumerWidget {
                 Text(
                   Formatters.formatDateDisplay(transaction.transactionDate),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary.withValues(alpha: 0.7),
-                      ),
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: stateColor.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
-                    Formatters.formatTransactionState(transaction.transactionState),
+                    Formatters.formatTransactionState(
+                      transaction.transactionState,
+                    ),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: stateColor,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 10,
-                        ),
+                      color: stateColor,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 10,
+                    ),
                   ),
                 ),
               ],
@@ -257,9 +282,9 @@ class TransactionsScreen extends ConsumerWidget {
         trailing: Text(
           Formatters.formatCurrency(displayAmount),
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: displayAmount >= 0 ? AppColors.success : AppColors.error,
-                fontWeight: FontWeight.bold,
-              ),
+            color: displayAmount >= 0 ? AppColors.success : AppColors.error,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         onTap: () => _showEditTransactionDialog(context, ref, transaction),
       ),
@@ -279,16 +304,16 @@ class TransactionsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'No Transactions Yet',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
           Text(
             'Tap the + button to add your first transaction',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary.withValues(alpha: 0.7),
-                ),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -303,30 +328,30 @@ class TransactionsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 60,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 60, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Failed to load transactions',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
               error,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
               onPressed: () {
-                ref.read(transactionsProvider(account.accountNameOwner).notifier).refresh();
+                ref
+                    .read(
+                      transactionsProvider(account.accountNameOwner).notifier,
+                    )
+                    .refresh();
               },
               icon: const Icon(Icons.refresh),
               label: const Text('Retry'),

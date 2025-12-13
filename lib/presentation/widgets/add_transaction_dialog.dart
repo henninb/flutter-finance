@@ -11,13 +11,11 @@ import '../providers/transaction_provider.dart';
 class AddTransactionDialog extends ConsumerStatefulWidget {
   final Account account;
 
-  const AddTransactionDialog({
-    super.key,
-    required this.account,
-  });
+  const AddTransactionDialog({super.key, required this.account});
 
   @override
-  ConsumerState<AddTransactionDialog> createState() => _AddTransactionDialogState();
+  ConsumerState<AddTransactionDialog> createState() =>
+      _AddTransactionDialogState();
 }
 
 class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
@@ -104,7 +102,9 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
           .addTransaction(transaction);
 
       // Invalidate totals to refresh them
-      ref.invalidate(transactionTotalsProvider(widget.account.accountNameOwner));
+      ref.invalidate(
+        transactionTotalsProvider(widget.account.accountNameOwner),
+      );
 
       if (mounted) {
         Navigator.pop(context);
@@ -167,23 +167,25 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                         children: [
                           Text(
                             'Add Transaction',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           Text(
                             widget.account.accountNameOwner,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
-                      onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.pop(context),
                     ),
                   ],
                 ),
@@ -214,32 +216,36 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                     if (textEditingValue.text.isEmpty) {
                       return _categories;
                     }
-                    return _categories.where((category) =>
-                        category.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                    return _categories.where(
+                      (category) => category.toLowerCase().contains(
+                        textEditingValue.text.toLowerCase(),
+                      ),
+                    );
                   },
                   onSelected: (value) {
                     _categoryController.text = value;
                   },
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                    _categoryController.text = controller.text;
-                    return TextFormField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Category *',
-                        prefixIcon: Icon(Icons.category),
-                        hintText: 'Select or type category',
-                      ),
-                      enabled: !_isSubmitting,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Category is required';
-                        }
-                        return null;
+                  fieldViewBuilder:
+                      (context, controller, focusNode, onFieldSubmitted) {
+                        _categoryController.text = controller.text;
+                        return TextFormField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            labelText: 'Category *',
+                            prefixIcon: Icon(Icons.category),
+                            hintText: 'Select or type category',
+                          ),
+                          enabled: !_isSubmitting,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Category is required';
+                            }
+                            return null;
+                          },
+                        );
                       },
-                    );
-                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -252,9 +258,14 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                     hintText: '0.00',
                   ),
                   enabled: !_isSubmitting,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                    signed: true,
+                  ),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^-?\d+\.?\d{0,2}')),
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^-?\d+\.?\d{0,2}'),
+                    ),
                   ],
                   textInputAction: TextInputAction.next,
                   validator: (value) {
@@ -281,8 +292,8 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                     child: Text(
                       Formatters.formatDateDisplay(_selectedDate),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -297,7 +308,10 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
                   ),
                   items: const [
                     DropdownMenuItem(value: 'cleared', child: Text('Cleared')),
-                    DropdownMenuItem(value: 'outstanding', child: Text('Outstanding')),
+                    DropdownMenuItem(
+                      value: 'outstanding',
+                      child: Text('Outstanding'),
+                    ),
                     DropdownMenuItem(value: 'future', child: Text('Future')),
                   ],
                   onChanged: _isSubmitting

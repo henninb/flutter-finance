@@ -18,17 +18,20 @@ class AuthRepository {
   /// Login with username and password
   /// Returns AuthToken on success
   Future<AuthToken> login(LoginRequest request) async {
-    _logger.i('🔐 AuthRepository: Starting login for user: ${request.username}');
+    _logger.i(
+      '🔐 AuthRepository: Starting login for user: ${request.username}',
+    );
 
     try {
       _logger.d('📤 AuthRepository: Sending POST /login request');
-      final response = await _dio.post(
-        '/login',
-        data: request.toJson(),
-      );
+      final response = await _dio.post('/login', data: request.toJson());
 
-      _logger.i('📥 AuthRepository: Login response received - Status: ${response.statusCode}');
-      _logger.d('📥 AuthRepository: Response data type: ${response.data.runtimeType}');
+      _logger.i(
+        '📥 AuthRepository: Login response received - Status: ${response.statusCode}',
+      );
+      _logger.d(
+        '📥 AuthRepository: Response data type: ${response.data.runtimeType}',
+      );
       _logger.d('📥 AuthRepository: Response data: ${response.data}');
       _logger.d('📥 AuthRepository: Response headers: ${response.headers}');
 
@@ -37,9 +40,10 @@ class AuthRepository {
 
       // Try response body first
       if (response.data is Map<String, dynamic>) {
-        token = response.data['token'] as String? ??
-                response.data['access_token'] as String? ??
-                '';
+        token =
+            response.data['token'] as String? ??
+            response.data['access_token'] as String? ??
+            '';
       }
 
       // If not in body, check Set-Cookie header
@@ -50,7 +54,9 @@ class AuthRepository {
           _logger.d('🍪 AuthRepository: Found ${cookies.length} cookies');
           // Look for token in cookies
           for (final cookie in cookies) {
-            _logger.d('🍪 AuthRepository: Cookie: ${cookie.substring(0, 50)}...');
+            _logger.d(
+              '🍪 AuthRepository: Cookie: ${cookie.substring(0, 50)}...',
+            );
             if (cookie.startsWith('token=')) {
               // Extract token value from cookie string
               final tokenStart = 'token='.length;
@@ -66,10 +72,14 @@ class AuthRepository {
         }
       }
 
-      _logger.d('🔑 AuthRepository: Extracted token: ${token.isEmpty ? "EMPTY" : "${token.substring(0, 20)}..."}');
+      _logger.d(
+        '🔑 AuthRepository: Extracted token: ${token.isEmpty ? "EMPTY" : "${token.substring(0, 20)}..."}',
+      );
 
       if (token.isEmpty) {
-        _logger.e('❌ AuthRepository: No token found in response body or cookies');
+        _logger.e(
+          '❌ AuthRepository: No token found in response body or cookies',
+        );
         throw Exception('No token received from server');
       }
 
@@ -77,12 +87,11 @@ class AuthRepository {
       final expiresIn = response.data['expiresIn'] as int? ?? 3600;
       final expiresAt = DateTime.now().add(Duration(seconds: expiresIn));
 
-      _logger.i('✅ AuthRepository: Token extracted successfully, expires at: $expiresAt');
-
-      return AuthToken(
-        token: token,
-        expiresAt: expiresAt,
+      _logger.i(
+        '✅ AuthRepository: Token extracted successfully, expires at: $expiresAt',
       );
+
+      return AuthToken(token: token, expiresAt: expiresAt);
     } on DioException catch (e) {
       _logger.e('❌ AuthRepository: DioException during login');
       _logger.e('   Status code: ${e.response?.statusCode}');
@@ -123,7 +132,9 @@ class AuthRepository {
       _logger.d('📥 AuthRepository: User info response: ${response.data}');
 
       final user = User.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ AuthRepository: User info retrieved - Username: ${user.username}');
+      _logger.i(
+        '✅ AuthRepository: User info retrieved - Username: ${user.username}',
+      );
 
       return user;
     } on DioException catch (e) {

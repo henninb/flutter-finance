@@ -14,11 +14,17 @@ class TransactionRepository {
   TransactionRepository(this._dio);
 
   /// Fetch all transactions for an account
-  Future<List<Transaction>> fetchTransactionsByAccount(String accountNameOwner) async {
-    _logger.i('📊 TransactionRepository: Fetching transactions for $accountNameOwner');
+  Future<List<Transaction>> fetchTransactionsByAccount(
+    String accountNameOwner,
+  ) async {
+    _logger.i(
+      '📊 TransactionRepository: Fetching transactions for $accountNameOwner',
+    );
 
     try {
-      final response = await _dio.get('/transaction/account/select/$accountNameOwner');
+      final response = await _dio.get(
+        '/transaction/account/select/$accountNameOwner',
+      );
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
       if (response.data is List) {
@@ -26,7 +32,9 @@ class TransactionRepository {
             .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
             .toList();
 
-        _logger.i('✅ TransactionRepository: Fetched ${transactions.length} transactions');
+        _logger.i(
+          '✅ TransactionRepository: Fetched ${transactions.length} transactions',
+        );
         return transactions;
       }
 
@@ -51,8 +59,12 @@ class TransactionRepository {
       final response = await _dio.get('/transaction/$guid');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final transaction = Transaction.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ TransactionRepository: Fetched transaction: ${transaction.description}');
+      final transaction = Transaction.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ TransactionRepository: Fetched transaction: ${transaction.description}',
+      );
 
       return transaction;
     } on DioException catch (e) {
@@ -67,7 +79,9 @@ class TransactionRepository {
 
   /// Create new transaction
   Future<Transaction> createTransaction(Transaction transaction) async {
-    _logger.i('➕ TransactionRepository: Creating transaction: ${transaction.description}');
+    _logger.i(
+      '➕ TransactionRepository: Creating transaction: ${transaction.description}',
+    );
 
     try {
       final response = await _dio.post(
@@ -77,8 +91,12 @@ class TransactionRepository {
 
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final createdTransaction = Transaction.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ TransactionRepository: Transaction created with ID: ${createdTransaction.transactionId}');
+      final createdTransaction = Transaction.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ TransactionRepository: Transaction created with ID: ${createdTransaction.transactionId}',
+      );
 
       return createdTransaction;
     } on DioException catch (e) {
@@ -94,7 +112,9 @@ class TransactionRepository {
 
   /// Update existing transaction
   Future<Transaction> updateTransaction(Transaction transaction) async {
-    _logger.i('✏️ TransactionRepository: Updating transaction ${transaction.guid}');
+    _logger.i(
+      '✏️ TransactionRepository: Updating transaction ${transaction.guid}',
+    );
 
     try {
       final response = await _dio.put(
@@ -104,8 +124,12 @@ class TransactionRepository {
 
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final updatedTransaction = Transaction.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ TransactionRepository: Transaction updated: ${updatedTransaction.description}');
+      final updatedTransaction = Transaction.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ TransactionRepository: Transaction updated: ${updatedTransaction.description}',
+      );
 
       return updatedTransaction;
     } on DioException catch (e) {
@@ -139,13 +163,17 @@ class TransactionRepository {
 
   /// Update transaction state
   Future<Transaction> updateTransactionState(String guid, String state) async {
-    _logger.i('🔄 TransactionRepository: Updating transaction $guid state to $state');
+    _logger.i(
+      '🔄 TransactionRepository: Updating transaction $guid state to $state',
+    );
 
     try {
       final response = await _dio.put('/transaction/state/update/$guid/$state');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final updatedTransaction = Transaction.fromJson(response.data as Map<String, dynamic>);
+      final updatedTransaction = Transaction.fromJson(
+        response.data as Map<String, dynamic>,
+      );
       _logger.i('✅ TransactionRepository: Transaction state updated');
 
       return updatedTransaction;
@@ -190,11 +218,17 @@ class TransactionRepository {
   }
 
   /// Fetch transaction totals for an account
-  Future<Map<String, double>> fetchAccountTotals(String accountNameOwner) async {
-    _logger.i('💰 TransactionRepository: Fetching totals for $accountNameOwner');
+  Future<Map<String, double>> fetchAccountTotals(
+    String accountNameOwner,
+  ) async {
+    _logger.i(
+      '💰 TransactionRepository: Fetching totals for $accountNameOwner',
+    );
 
     try {
-      final response = await _dio.get('/transaction/account/totals/$accountNameOwner');
+      final response = await _dio.get(
+        '/transaction/account/totals/$accountNameOwner',
+      );
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
       final totals = {
@@ -204,7 +238,9 @@ class TransactionRepository {
         'totalsFuture': _parseDouble(response.data['totalsFuture']),
       };
 
-      _logger.i('✅ TransactionRepository: Fetched totals - Total: \$${totals['totals']}');
+      _logger.i(
+        '✅ TransactionRepository: Fetched totals - Total: \$${totals['totals']}',
+      );
       return totals;
     } on DioException catch (e) {
       _logger.e('❌ TransactionRepository: Failed to fetch totals');

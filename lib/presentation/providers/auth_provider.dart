@@ -47,7 +47,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final SecureStorageService _secureStorage;
 
   AuthNotifier(this._authRepository, this._secureStorage)
-      : super(const AuthState()) {
+    : super(const AuthState()) {
     _checkAuthStatus();
   }
 
@@ -93,10 +93,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final loginRequest = LoginRequest(
-        username: username,
-        password: password,
-      );
+      final loginRequest = LoginRequest(username: username, password: password);
 
       _logger.d('📤 AuthNotifier: Calling auth repository login');
       final authToken = await _authRepository.login(loginRequest);
@@ -108,11 +105,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       _logger.d('👤 AuthNotifier: Fetching user information');
       final user = await _authRepository.getCurrentUser();
 
-      state = AuthState(
-        user: user,
-        isLoading: false,
-        isAuthenticated: true,
-      );
+      state = AuthState(user: user, isLoading: false, isAuthenticated: true);
 
       _logger.i('✅ AuthNotifier: Login successful for user: ${user.username}');
     } catch (e) {
@@ -133,7 +126,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _authRepository.logout();
     } catch (e) {
-      _logger.w('⚠️ AuthNotifier: Logout API call failed, clearing local session anyway: $e');
+      _logger.w(
+        '⚠️ AuthNotifier: Logout API call failed, clearing local session anyway: $e',
+      );
       // Continue with logout even if API call fails
     } finally {
       await _secureStorage.clearAuthToken();

@@ -16,11 +16,7 @@ void main() async {
   // Set environment
   EnvConfig.setEnvironment(Environment.development);
 
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -73,10 +69,7 @@ class MyApp extends ConsumerWidget {
           path: '/login',
           builder: (context, state) => const LoginScreen(),
         ),
-        GoRoute(
-          path: '/',
-          builder: (context, state) => const AccountsScreen(),
-        ),
+        GoRoute(path: '/', builder: (context, state) => const AccountsScreen()),
       ],
     );
   }
@@ -135,9 +128,9 @@ class HomePage extends ConsumerWidget {
                 Text(
                   'Welcome, ${user.username}!',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               const SizedBox(height: 32),
               _buildInfoCard(
@@ -167,9 +160,7 @@ class HomePage extends ConsumerWidget {
               ElevatedButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Authentication is working!'),
-                    ),
+                    const SnackBar(content: Text('Authentication is working!')),
                   );
                 },
                 child: const Text('Test Authentication'),
@@ -181,7 +172,11 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, {required String title, required String value}) {
+  Widget _buildInfoCard(
+    BuildContext context, {
+    required String title,
+    required String value,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -192,16 +187,13 @@ class HomePage extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.labelLarge,
-          ),
+          Text(title, style: Theme.of(context).textTheme.labelLarge),
           Flexible(
             child: Text(
               value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.primary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.primary),
               textAlign: TextAlign.right,
               overflow: TextOverflow.ellipsis,
             ),

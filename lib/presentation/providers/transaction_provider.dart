@@ -64,7 +64,13 @@ class TransactionsState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [allTransactions, currentPage, pageSize, isLoading, errorMessage];
+  List<Object?> get props => [
+    allTransactions,
+    currentPage,
+    pageSize,
+    isLoading,
+    errorMessage,
+  ];
 }
 
 /// Transaction list state notifier for a specific account
@@ -73,18 +79,24 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
   final String accountNameOwner;
 
   TransactionsNotifier(this._repository, this.accountNameOwner)
-      : super(const TransactionsState(isLoading: true)) {
+    : super(const TransactionsState(isLoading: true)) {
     fetchTransactions();
   }
 
   /// Fetch all transactions for the account
   Future<void> fetchTransactions() async {
-    _logger.i('📊 TransactionsNotifier: Fetching transactions for $accountNameOwner');
+    _logger.i(
+      '📊 TransactionsNotifier: Fetching transactions for $accountNameOwner',
+    );
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final transactions = await _repository.fetchTransactionsByAccount(accountNameOwner);
-      _logger.i('✅ TransactionsNotifier: Loaded ${transactions.length} transactions');
+      final transactions = await _repository.fetchTransactionsByAccount(
+        accountNameOwner,
+      );
+      _logger.i(
+        '✅ TransactionsNotifier: Loaded ${transactions.length} transactions',
+      );
 
       // Sort transactions by date, newest first
       final sortedTransactions = List<Transaction>.from(transactions)
@@ -97,17 +109,16 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
       );
     } catch (e) {
       _logger.e('❌ TransactionsNotifier: Error loading transactions: $e');
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: e.toString(),
-      );
+      state = state.copyWith(isLoading: false, errorMessage: e.toString());
     }
   }
 
   /// Go to next page
   void nextPage() {
     if (state.hasNextPage) {
-      _logger.i('📄 TransactionsNotifier: Going to page ${state.currentPage + 1}');
+      _logger.i(
+        '📄 TransactionsNotifier: Going to page ${state.currentPage + 1}',
+      );
       state = state.copyWith(currentPage: state.currentPage + 1);
     }
   }
@@ -115,7 +126,9 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
   /// Go to previous page
   void previousPage() {
     if (state.hasPreviousPage) {
-      _logger.i('📄 TransactionsNotifier: Going to page ${state.currentPage - 1}');
+      _logger.i(
+        '📄 TransactionsNotifier: Going to page ${state.currentPage - 1}',
+      );
       state = state.copyWith(currentPage: state.currentPage - 1);
     }
   }
@@ -130,7 +143,9 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
 
   /// Add new transaction
   Future<void> addTransaction(Transaction transaction) async {
-    _logger.i('➕ TransactionsNotifier: Adding transaction: ${transaction.description}');
+    _logger.i(
+      '➕ TransactionsNotifier: Adding transaction: ${transaction.description}',
+    );
 
     try {
       await _repository.createTransaction(transaction);
@@ -144,7 +159,9 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
 
   /// Update existing transaction
   Future<void> updateTransaction(Transaction transaction) async {
-    _logger.i('✏️ TransactionsNotifier: Updating transaction ${transaction.guid}');
+    _logger.i(
+      '✏️ TransactionsNotifier: Updating transaction ${transaction.guid}',
+    );
 
     try {
       await _repository.updateTransaction(transaction);
@@ -172,14 +189,20 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
 
   /// Update transaction state
   Future<void> updateTransactionState(String guid, String state) async {
-    _logger.i('🔄 TransactionsNotifier: Updating transaction $guid state to $state');
+    _logger.i(
+      '🔄 TransactionsNotifier: Updating transaction $guid state to $state',
+    );
 
     try {
       await _repository.updateTransactionState(guid, state);
-      _logger.i('✅ TransactionsNotifier: Transaction state updated, refreshing list');
+      _logger.i(
+        '✅ TransactionsNotifier: Transaction state updated, refreshing list',
+      );
       await fetchTransactions();
     } catch (e) {
-      _logger.e('❌ TransactionsNotifier: Failed to update transaction state: $e');
+      _logger.e(
+        '❌ TransactionsNotifier: Failed to update transaction state: $e',
+      );
       rethrow;
     }
   }
@@ -192,17 +215,25 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
 }
 
 /// Provider family for transactions by account
-final transactionsProvider = StateNotifierProvider.family<
-    TransactionsNotifier,
-    TransactionsState,
-    String>((ref, accountNameOwner) {
-  final repository = ref.watch(transactionRepositoryProvider);
-  return TransactionsNotifier(repository, accountNameOwner);
-});
+final transactionsProvider =
+    StateNotifierProvider.family<
+      TransactionsNotifier,
+      TransactionsState,
+      String
+    >((ref, accountNameOwner) {
+      final repository = ref.watch(transactionRepositoryProvider);
+      return TransactionsNotifier(repository, accountNameOwner);
+    });
 
 /// Provider family for transaction totals by account
-final transactionTotalsProvider = FutureProvider.family<Map<String, double>, String>((ref, accountNameOwner) async {
-  _logger.i('💰 TransactionTotalsProvider: Fetching totals for $accountNameOwner');
-  final repository = ref.watch(transactionRepositoryProvider);
-  return await repository.fetchAccountTotals(accountNameOwner);
-});
+final transactionTotalsProvider =
+    FutureProvider.family<Map<String, double>, String>((
+      ref,
+      accountNameOwner,
+    ) async {
+      _logger.i(
+        '💰 TransactionTotalsProvider: Fetching totals for $accountNameOwner',
+      );
+      final repository = ref.watch(transactionRepositoryProvider);
+      return await repository.fetchAccountTotals(accountNameOwner);
+    });

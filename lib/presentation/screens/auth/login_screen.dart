@@ -55,10 +55,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         await secureStorage.clearSavedUsername();
       }
 
-      await ref.read(authProvider.notifier).login(
-            username,
-            _passwordController.text,
-          );
+      await ref
+          .read(authProvider.notifier)
+          .login(username, _passwordController.text);
     }
   }
 
@@ -101,9 +100,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Finance App',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -111,8 +110,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text(
                   'Sign in to continue',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                    color: AppColors.textSecondary,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
@@ -186,9 +185,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     },
                               child: Text(
                                 'Remember username',
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.textSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: AppColors.textSecondary),
                               ),
                             ),
                           ),

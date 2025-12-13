@@ -3,10 +3,7 @@ class AuthToken {
   final String token;
   final DateTime expiresAt;
 
-  const AuthToken({
-    required this.token,
-    required this.expiresAt,
-  });
+  const AuthToken({required this.token, required this.expiresAt});
 
   /// Check if token is expired
   bool get isExpired {
@@ -25,9 +22,6 @@ class AuthToken {
 
   /// Convert to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'token': token,
-      'expiresAt': expiresAt.toIso8601String(),
-    };
+    return {'token': token, 'expiresAt': expiresAt.toIso8601String()};
   }
 }

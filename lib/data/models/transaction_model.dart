@@ -62,7 +62,9 @@ class Transaction extends Equatable {
       if (accountId != null) 'accountId': accountId,
       'accountNameOwner': accountNameOwner,
       'accountType': accountType,
-      'transactionDate': transactionDate.toIso8601String().split('T')[0], // yyyy-MM-dd format
+      'transactionDate': transactionDate.toIso8601String().split(
+        'T',
+      )[0], // yyyy-MM-dd format
       'description': description,
       'category': category,
       'amount': amount,
@@ -111,21 +113,21 @@ class Transaction extends Equatable {
 
   @override
   List<Object?> get props => [
-        transactionId,
-        guid,
-        accountId,
-        accountNameOwner,
-        accountType,
-        transactionDate,
-        description,
-        category,
-        amount,
-        transactionState,
-        transactionType,
-        reoccurringType,
-        activeStatus,
-        notes,
-      ];
+    transactionId,
+    guid,
+    accountId,
+    accountNameOwner,
+    accountType,
+    transactionDate,
+    description,
+    category,
+    amount,
+    transactionState,
+    transactionType,
+    reoccurringType,
+    activeStatus,
+    notes,
+  ];
 
   @override
   String toString() {

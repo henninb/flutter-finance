@@ -69,16 +69,16 @@ class AccountTotalsCard extends ConsumerWidget {
                   Text(
                     'Total Balance',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     Formatters.formatCurrency(total),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: total >= 0 ? AppColors.success : AppColors.error,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: total >= 0 ? AppColors.success : AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -140,10 +140,7 @@ class AccountTotalsCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,9 +153,9 @@ class AccountTotalsCard extends ConsumerWidget {
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 10,
-                      ),
+                    color: AppColors.textSecondary,
+                    fontSize: 10,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -168,10 +165,10 @@ class AccountTotalsCard extends ConsumerWidget {
           Text(
             Formatters.formatCurrency(amount),
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: amount >= 0 ? color : AppColors.error,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+              color: amount >= 0 ? color : AppColors.error,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ],

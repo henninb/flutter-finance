@@ -57,18 +57,19 @@ class AccountCard extends StatelessWidget {
                       children: [
                         Text(
                           account.accountNameOwner,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: AppColors.textPrimary,
                               ),
                           overflow: TextOverflow.ellipsis,
                         ),
-                        if (account.moniker != null && account.moniker!.isNotEmpty)
+                        if (account.moniker != null &&
+                            account.moniker!.isNotEmpty)
                           Text(
                             account.moniker!,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: AppColors.textSecondary),
                           ),
                       ],
                     ),
@@ -77,7 +78,10 @@ class AccountCard extends StatelessWidget {
                   // Action buttons
                   if (onEdit != null || onDelete != null)
                     PopupMenuButton<String>(
-                      icon: const Icon(Icons.more_vert, color: AppColors.textSecondary),
+                      icon: const Icon(
+                        Icons.more_vert,
+                        color: AppColors.textSecondary,
+                      ),
                       onSelected: (value) {
                         if (value == 'edit' && onEdit != null) {
                           onEdit!();
@@ -102,9 +106,16 @@ class AccountCard extends StatelessWidget {
                             value: 'delete',
                             child: Row(
                               children: [
-                                Icon(Icons.delete, size: 20, color: AppColors.error),
+                                Icon(
+                                  Icons.delete,
+                                  size: 20,
+                                  color: AppColors.error,
+                                ),
                                 SizedBox(width: 8),
-                                Text('Delete', style: TextStyle(color: AppColors.error)),
+                                Text(
+                                  'Delete',
+                                  style: TextStyle(color: AppColors.error),
+                                ),
                               ],
                             ),
                           ),
@@ -156,16 +167,18 @@ class AccountCard extends StatelessWidget {
                   Text(
                     'Total Balance',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   Text(
                     Formatters.formatCurrency(account.total),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: account.total >= 0 ? AppColors.success : AppColors.error,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: account.total >= 0
+                          ? AppColors.success
+                          : AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -187,17 +200,17 @@ class AccountCard extends StatelessWidget {
       children: [
         Text(
           label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: 4),
         Text(
           Formatters.formatCurrency(amount),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: amount >= 0 ? color : AppColors.error,
-                fontWeight: FontWeight.w600,
-              ),
+            color: amount >= 0 ? color : AppColors.error,
+            fontWeight: FontWeight.w600,
+          ),
           overflow: TextOverflow.ellipsis,
         ),
       ],

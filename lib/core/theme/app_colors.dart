@@ -14,12 +14,20 @@ class AppColors {
 
   // Background Colors
   static const Color backgroundDefault = Color(0xFF0F172A); // Very dark slate
-  static const Color backgroundPaper = Color(0xFF1E293B); // Dark slate for cards
-  static const Color backgroundAlternate = Color(0xFF1A2332); // For alternating rows
+  static const Color backgroundPaper = Color(
+    0xFF1E293B,
+  ); // Dark slate for cards
+  static const Color backgroundAlternate = Color(
+    0xFF1A2332,
+  ); // For alternating rows
 
   // Text Colors
-  static const Color textPrimary = Color(0xFFF8FAFC); // Near white for main text
-  static const Color textSecondary = Color(0xFFCBD5E1); // Light slate for secondary text
+  static const Color textPrimary = Color(
+    0xFFF8FAFC,
+  ); // Near white for main text
+  static const Color textSecondary = Color(
+    0xFFCBD5E1,
+  ); // Light slate for secondary text
 
   // Divider & Borders
   static const Color divider = Color(0xFF334155); // Medium slate

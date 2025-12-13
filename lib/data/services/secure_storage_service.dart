@@ -19,7 +19,9 @@ class SecureStorageService {
   /// Save authentication token securely
   Future<void> saveAuthToken(AuthToken token) async {
     _logger.i('💾 SecureStorage: Saving auth token');
-    _logger.d('💾 SecureStorage: Token (first 20 chars): ${token.token.substring(0, 20)}...');
+    _logger.d(
+      '💾 SecureStorage: Token (first 20 chars): ${token.token.substring(0, 20)}...',
+    );
     _logger.d('💾 SecureStorage: Expires at: ${token.expiresAt}');
 
     await _storage.write(key: _tokenKey, value: token.token);
@@ -46,7 +48,9 @@ class SecureStorageService {
     try {
       final expiresAt = DateTime.parse(expiresAtStr);
       _logger.d('✅ SecureStorage: Token retrieved, expires at: $expiresAt');
-      _logger.d('🔍 SecureStorage: Token (first 20 chars): ${token.substring(0, 20)}...');
+      _logger.d(
+        '🔍 SecureStorage: Token (first 20 chars): ${token.substring(0, 20)}...',
+      );
       return AuthToken(token: token, expiresAt: expiresAt);
     } catch (e) {
       _logger.e('❌ SecureStorage: Failed to parse token data: $e');
@@ -117,9 +121,7 @@ class SecureStorageService {
 
 /// Provider for FlutterSecureStorage
 final flutterSecureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage(
-    aOptions: AndroidOptions(),
-  );
+  return const FlutterSecureStorage(aOptions: AndroidOptions());
 });
 
 /// Provider for SecureStorageService

@@ -36,10 +36,16 @@ class AuthInterceptor extends Interceptor {
     if (authToken != null && !authToken.isExpired) {
       // Add Authorization header with Bearer token
       options.headers['Authorization'] = 'Bearer ${authToken.token}';
-      _logger.i('✅ AuthInterceptor: Added Bearer token to request: ${options.uri}');
-      _logger.d('🔑 AuthInterceptor: Token (first 20 chars): ${authToken.token.substring(0, 20)}...');
+      _logger.i(
+        '✅ AuthInterceptor: Added Bearer token to request: ${options.uri}',
+      );
+      _logger.d(
+        '🔑 AuthInterceptor: Token (first 20 chars): ${authToken.token.substring(0, 20)}...',
+      );
     } else {
-      _logger.w('⚠️ AuthInterceptor: No valid token available for request: ${options.uri}');
+      _logger.w(
+        '⚠️ AuthInterceptor: No valid token available for request: ${options.uri}',
+      );
     }
 
     return handler.next(options);
@@ -95,13 +101,17 @@ final dioProvider = Provider<Dio>((ref) {
         return handler.next(options);
       },
       onResponse: (response, handler) {
-        _logger.i('📥 HTTP Response: ${response.statusCode} ${response.requestOptions.uri}');
+        _logger.i(
+          '📥 HTTP Response: ${response.statusCode} ${response.requestOptions.uri}',
+        );
         _logger.d('📥 Response headers: ${response.headers}');
         _logger.d('📥 Response data: ${response.data}');
         return handler.next(response);
       },
       onError: (error, handler) async {
-        _logger.e('❌ HTTP Error: ${error.response?.statusCode} ${error.requestOptions.uri}');
+        _logger.e(
+          '❌ HTTP Error: ${error.response?.statusCode} ${error.requestOptions.uri}',
+        );
         _logger.e('   Error type: ${error.type}');
         _logger.e('   Error message: ${error.message}');
         _logger.e('   Response data: ${error.response?.data}');

@@ -32,7 +32,9 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
 
   /// Add new account
   Future<void> addAccount(Account account) async {
-    _logger.i('➕ AccountsNotifier: Adding account: ${account.accountNameOwner}');
+    _logger.i(
+      '➕ AccountsNotifier: Adding account: ${account.accountNameOwner}',
+    );
 
     try {
       await _repository.createAccount(account);
@@ -82,9 +84,9 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
 /// Provider for accounts list
 final accountsProvider =
     StateNotifierProvider<AccountsNotifier, AsyncValue<List<Account>>>((ref) {
-  final repository = ref.watch(accountRepositoryProvider);
-  return AccountsNotifier(repository);
-});
+      final repository = ref.watch(accountRepositoryProvider);
+      return AccountsNotifier(repository);
+    });
 
 /// Provider for account totals
 final accountTotalsProvider = FutureProvider<Map<String, double>>((ref) async {
@@ -94,14 +96,17 @@ final accountTotalsProvider = FutureProvider<Map<String, double>>((ref) async {
 });
 
 /// Provider to get accounts by type (debit/credit)
-final accountsByTypeProvider =
-    Provider.family<List<Account>, String>((ref, accountType) {
+final accountsByTypeProvider = Provider.family<List<Account>, String>((
+  ref,
+  accountType,
+) {
   final accountsAsync = ref.watch(accountsProvider);
 
   return accountsAsync.when(
     data: (accounts) {
-      final filtered =
-          accounts.where((a) => a.accountType == accountType).toList();
+      final filtered = accounts
+          .where((a) => a.accountType == accountType)
+          .toList();
       _logger.d('📊 Filtered ${filtered.length} $accountType accounts');
       return filtered;
     },

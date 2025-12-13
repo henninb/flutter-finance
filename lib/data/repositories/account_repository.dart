@@ -52,11 +52,15 @@ class AccountRepository {
       _logger.d('📥 AccountRepository: Response: ${response.data}');
 
       final account = Account.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ AccountRepository: Fetched account: ${account.accountNameOwner}');
+      _logger.i(
+        '✅ AccountRepository: Fetched account: ${account.accountNameOwner}',
+      );
 
       return account;
     } on DioException catch (e) {
-      _logger.e('❌ AccountRepository: Failed to fetch account $accountNameOwner');
+      _logger.e(
+        '❌ AccountRepository: Failed to fetch account $accountNameOwner',
+      );
       _logger.e('   Status code: ${e.response?.statusCode}');
       throw Exception('Failed to fetch account: ${e.message}');
     } catch (e) {
@@ -67,18 +71,21 @@ class AccountRepository {
 
   /// Create new account
   Future<Account> createAccount(Account account) async {
-    _logger.i('➕ AccountRepository: Creating account: ${account.accountNameOwner}');
+    _logger.i(
+      '➕ AccountRepository: Creating account: ${account.accountNameOwner}',
+    );
 
     try {
-      final response = await _dio.post(
-        '/account',
-        data: account.toJson(),
-      );
+      final response = await _dio.post('/account', data: account.toJson());
 
       _logger.d('📥 AccountRepository: Response: ${response.data}');
 
-      final createdAccount = Account.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ AccountRepository: Account created with ID: ${createdAccount.accountId}');
+      final createdAccount = Account.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ AccountRepository: Account created with ID: ${createdAccount.accountId}',
+      );
 
       return createdAccount;
     } on DioException catch (e) {
@@ -94,18 +101,21 @@ class AccountRepository {
 
   /// Update existing account
   Future<Account> updateAccount(Account account) async {
-    _logger.i('✏️ AccountRepository: Updating account ${account.accountNameOwner}');
+    _logger.i(
+      '✏️ AccountRepository: Updating account ${account.accountNameOwner}',
+    );
 
     try {
-      final response = await _dio.put(
-        '/account',
-        data: account.toJson(),
-      );
+      final response = await _dio.put('/account', data: account.toJson());
 
       _logger.d('📥 AccountRepository: Response: ${response.data}');
 
-      final updatedAccount = Account.fromJson(response.data as Map<String, dynamic>);
-      _logger.i('✅ AccountRepository: Account updated: ${updatedAccount.accountNameOwner}');
+      final updatedAccount = Account.fromJson(
+        response.data as Map<String, dynamic>,
+      );
+      _logger.i(
+        '✅ AccountRepository: Account updated: ${updatedAccount.accountNameOwner}',
+      );
 
       return updatedAccount;
     } on DioException catch (e) {
@@ -160,7 +170,9 @@ class AccountRepository {
         'totalsFuture': _parseDouble(response.data['totalsFuture']),
       };
 
-      _logger.i('✅ AccountRepository: Fetched totals - Total: \$${totals['totals']}');
+      _logger.i(
+        '✅ AccountRepository: Fetched totals - Total: \$${totals['totals']}',
+      );
       return totals;
     } on DioException catch (e) {
       _logger.e('❌ AccountRepository: Failed to fetch totals');

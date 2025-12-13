@@ -5,10 +5,7 @@ class User extends Equatable {
   final String username;
   final String? email;
 
-  const User({
-    required this.username,
-    this.email,
-  });
+  const User({required this.username, this.email});
 
   /// Create User from JSON
   factory User.fromJson(Map<String, dynamic> json) {
@@ -20,17 +17,11 @@ class User extends Equatable {
 
   /// Convert User to JSON
   Map<String, dynamic> toJson() {
-    return {
-      'username': username,
-      if (email != null) 'email': email,
-    };
+    return {'username': username, if (email != null) 'email': email};
   }
 
   /// Copy with method
-  User copyWith({
-    String? username,
-    String? email,
-  }) {
+  User copyWith({String? username, String? email}) {
     return User(
       username: username ?? this.username,
       email: email ?? this.email,

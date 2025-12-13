@@ -17,7 +17,8 @@ class EditTransactionDialog extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<EditTransactionDialog> createState() => _EditTransactionDialogState();
+  ConsumerState<EditTransactionDialog> createState() =>
+      _EditTransactionDialogState();
 }
 
 class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
@@ -52,21 +53,29 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
   void initState() {
     super.initState();
     // Pre-fill all fields with existing transaction data
-    _descriptionController = TextEditingController(text: widget.transaction.description);
-    _categoryController = TextEditingController(text: widget.transaction.category);
-    _amountController = TextEditingController(text: widget.transaction.amount.toString());
+    _descriptionController = TextEditingController(
+      text: widget.transaction.description,
+    );
+    _categoryController = TextEditingController(
+      text: widget.transaction.category,
+    );
+    _amountController = TextEditingController(
+      text: widget.transaction.amount.toString(),
+    );
     _notesController = TextEditingController(text: widget.transaction.notes);
     _selectedDate = widget.transaction.transactionDate;
 
     // Validate transaction state - default to 'outstanding' if invalid
     final validStates = ['cleared', 'outstanding', 'future'];
-    _transactionState = validStates.contains(widget.transaction.transactionState.toLowerCase())
+    _transactionState =
+        validStates.contains(widget.transaction.transactionState.toLowerCase())
         ? widget.transaction.transactionState.toLowerCase()
         : 'outstanding';
 
     // Validate transaction type - default to 'expense' if invalid
     final validTypes = ['expense', 'income'];
-    _transactionType = validTypes.contains(widget.transaction.transactionType.toLowerCase())
+    _transactionType =
+        validTypes.contains(widget.transaction.transactionType.toLowerCase())
         ? widget.transaction.transactionType.toLowerCase()
         : 'expense';
   }
@@ -185,23 +194,25 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                         children: [
                           Text(
                             'Edit Transaction',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            style: Theme.of(context).textTheme.titleLarge
+                                ?.copyWith(
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.bold,
                                 ),
                           ),
                           Text(
                             widget.accountNameOwner,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(color: AppColors.textSecondary),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
-                      onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                      onPressed: _isSubmitting
+                          ? null
+                          : () => Navigator.pop(context),
                     ),
                   ],
                 ),
@@ -228,37 +239,43 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
 
                 // Category field with autocomplete
                 Autocomplete<String>(
-                  initialValue: TextEditingValue(text: _categoryController.text),
+                  initialValue: TextEditingValue(
+                    text: _categoryController.text,
+                  ),
                   optionsBuilder: (textEditingValue) {
                     if (textEditingValue.text.isEmpty) {
                       return _categories;
                     }
-                    return _categories.where((category) =>
-                        category.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                    return _categories.where(
+                      (category) => category.toLowerCase().contains(
+                        textEditingValue.text.toLowerCase(),
+                      ),
+                    );
                   },
                   onSelected: (value) {
                     _categoryController.text = value;
                   },
-                  fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                    _categoryController.text = controller.text;
-                    return TextFormField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      decoration: const InputDecoration(
-                        labelText: 'Category *',
-                        prefixIcon: Icon(Icons.category),
-                        hintText: 'Select or type category',
-                      ),
-                      enabled: !_isSubmitting,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Category is required';
-                        }
-                        return null;
+                  fieldViewBuilder:
+                      (context, controller, focusNode, onFieldSubmitted) {
+                        _categoryController.text = controller.text;
+                        return TextFormField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            labelText: 'Category *',
+                            prefixIcon: Icon(Icons.category),
+                            hintText: 'Select or type category',
+                          ),
+                          enabled: !_isSubmitting,
+                          textInputAction: TextInputAction.next,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Category is required';
+                            }
+                            return null;
+                          },
+                        );
                       },
-                    );
-                  },
                 ),
                 const SizedBox(height: 16),
 
@@ -271,9 +288,14 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                     hintText: '0.00',
                   ),
                   enabled: !_isSubmitting,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                    signed: true,
+                  ),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'^-?\d+\.?\d{0,2}')),
+                    FilteringTextInputFormatter.allow(
+                      RegExp(r'^-?\d+\.?\d{0,2}'),
+                    ),
                   ],
                   textInputAction: TextInputAction.next,
                   validator: (value) {
@@ -323,8 +345,8 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                     child: Text(
                       Formatters.formatDateDisplay(_selectedDate),
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   ),
                 ),
@@ -339,7 +361,10 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                   ),
                   items: const [
                     DropdownMenuItem(value: 'cleared', child: Text('Cleared')),
-                    DropdownMenuItem(value: 'outstanding', child: Text('Outstanding')),
+                    DropdownMenuItem(
+                      value: 'outstanding',
+                      child: Text('Outstanding'),
+                    ),
                     DropdownMenuItem(value: 'future', child: Text('Future')),
                   ],
                   onChanged: _isSubmitting
@@ -389,7 +414,9 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
 
                 // Delete button
                 OutlinedButton(
-                  onPressed: _isSubmitting ? null : () => _showDeleteConfirmation(context),
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => _showDeleteConfirmation(context),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     foregroundColor: AppColors.error,
@@ -427,11 +454,15 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
               Navigator.pop(dialogContext); // Close confirmation dialog
               try {
                 await ref
-                    .read(transactionsProvider(widget.accountNameOwner).notifier)
+                    .read(
+                      transactionsProvider(widget.accountNameOwner).notifier,
+                    )
                     .deleteTransaction(widget.transaction.guid);
 
                 // Invalidate totals to refresh them
-                ref.invalidate(transactionTotalsProvider(widget.accountNameOwner));
+                ref.invalidate(
+                  transactionTotalsProvider(widget.accountNameOwner),
+                );
 
                 if (!mounted) return;
                 navigator.pop(); // Close edit dialog

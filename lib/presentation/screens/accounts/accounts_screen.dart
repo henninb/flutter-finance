@@ -35,7 +35,12 @@ class AccountsScreen extends ConsumerWidget {
           ref.invalidate(accountTotalsProvider);
         },
         child: accountsAsync.when(
-          data: (accounts) => _buildAccountsList(context, ref, accounts, authState.user?.username),
+          data: (accounts) => _buildAccountsList(
+            context,
+            ref,
+            accounts,
+            authState.user?.username,
+          ),
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => _buildErrorView(context, ref, error),
         ),
@@ -66,7 +71,9 @@ class AccountsScreen extends ConsumerWidget {
 
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 80),
-      itemCount: filteredAccounts.length + 2, // +1 for totals card, +1 for search field
+      itemCount:
+          filteredAccounts.length +
+          2, // +1 for totals card, +1 for search field
       itemBuilder: (context, index) {
         if (index == 0) {
           return const AccountTotalsCard();
@@ -130,17 +137,24 @@ class AccountsScreen extends ConsumerWidget {
           fillColor: AppColors.backgroundPaper,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.textSecondary.withValues(alpha: 0.3)),
+            borderSide: BorderSide(
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
+            ),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: AppColors.textSecondary.withValues(alpha: 0.3)),
+            borderSide: BorderSide(
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
+            ),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: const BorderSide(color: AppColors.primary, width: 2),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 12,
+          ),
         ),
       ),
     );
@@ -159,16 +173,16 @@ class AccountsScreen extends ConsumerWidget {
           const SizedBox(height: 16),
           Text(
             'No Accounts Yet',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: AppColors.textSecondary),
           ),
           const SizedBox(height: 8),
           Text(
             'Tap the + button to add your first account',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary.withValues(alpha: 0.7),
-                ),
+              color: AppColors.textSecondary.withValues(alpha: 0.7),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -183,24 +197,20 @@ class AccountsScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.error_outline,
-              size: 60,
-              color: AppColors.error,
-            ),
+            const Icon(Icons.error_outline, size: 60, color: AppColors.error),
             const SizedBox(height: 16),
             Text(
               'Failed to load accounts',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
               error.toString(),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -218,12 +228,16 @@ class AccountsScreen extends ConsumerWidget {
   }
 
   void _showAddAccountDialog(BuildContext context, WidgetRef ref) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Add Account coming soon!')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Add Account coming soon!')));
   }
 
-  void _showEditAccountDialog(BuildContext context, WidgetRef ref, Account account) {
+  void _showEditAccountDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Account account,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Edit ${account.accountNameOwner} coming soon!')),
     );
@@ -238,7 +252,11 @@ class AccountsScreen extends ConsumerWidget {
     );
   }
 
-  void _showDeleteConfirmation(BuildContext context, WidgetRef ref, Account account) {
+  void _showDeleteConfirmation(
+    BuildContext context,
+    WidgetRef ref,
+    Account account,
+  ) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -255,10 +273,14 @@ class AccountsScreen extends ConsumerWidget {
             onPressed: () async {
               Navigator.pop(context);
               try {
-                await ref.read(accountsProvider.notifier).deleteAccount(account.accountNameOwner);
+                await ref
+                    .read(accountsProvider.notifier)
+                    .deleteAccount(account.accountNameOwner);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Account deleted successfully')),
+                    const SnackBar(
+                      content: Text('Account deleted successfully'),
+                    ),
                   );
                 }
               } catch (e) {

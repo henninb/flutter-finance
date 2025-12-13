@@ -7,10 +7,7 @@ import '../providers/transaction_provider.dart';
 class TransactionTotalsCard extends ConsumerWidget {
   final String accountNameOwner;
 
-  const TransactionTotalsCard({
-    super.key,
-    required this.accountNameOwner,
-  });
+  const TransactionTotalsCard({super.key, required this.accountNameOwner});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,16 +71,16 @@ class TransactionTotalsCard extends ConsumerWidget {
                   Text(
                     'Account Balance',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     Formatters.formatCurrency(total),
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: total >= 0 ? AppColors.success : AppColors.error,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: total >= 0 ? AppColors.success : AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -145,10 +142,7 @@ class TransactionTotalsCard extends ConsumerWidget {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,9 +155,9 @@ class TransactionTotalsCard extends ConsumerWidget {
                 child: Text(
                   label,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontSize: 10,
-                      ),
+                    color: AppColors.textSecondary,
+                    fontSize: 10,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -173,10 +167,10 @@ class TransactionTotalsCard extends ConsumerWidget {
           Text(
             Formatters.formatCurrency(amount),
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  color: amount >= 0 ? color : AppColors.error,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
+              color: amount >= 0 ? color : AppColors.error,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
             overflow: TextOverflow.ellipsis,
           ),
         ],
