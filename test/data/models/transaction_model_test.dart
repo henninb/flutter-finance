@@ -92,10 +92,7 @@ void main() {
       );
 
       // Act
-      final updated = original.copyWith(
-        description: 'Updated',
-        amount: 200.0,
-      );
+      final updated = original.copyWith(description: 'Updated', amount: 200.0);
 
       // Assert
       expect(updated.description, 'Updated');

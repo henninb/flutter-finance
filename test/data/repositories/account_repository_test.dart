@@ -81,12 +81,7 @@ void main() {
         'future': 0.0,
       };
 
-      when(
-        mockDio.post(
-          '/account',
-          data: anyNamed('data'),
-        ),
-      ).thenAnswer(
+      when(mockDio.post('/account', data: anyNamed('data'))).thenAnswer(
         (_) async => Response(
           requestOptions: RequestOptions(path: '/account'),
           statusCode: 201,
@@ -101,9 +96,7 @@ void main() {
       expect(result, isA<Account>());
       expect(result.accountId, 3);
       expect(result.accountNameOwner, 'test_account');
-      verify(
-        mockDio.post('/account', data: anyNamed('data')),
-      ).called(1);
+      verify(mockDio.post('/account', data: anyNamed('data'))).called(1);
     });
 
     test('updateAccount should return updated account', () async {
@@ -126,12 +119,7 @@ void main() {
         'future': 0.0,
       };
 
-      when(
-        mockDio.put(
-          '/account',
-          data: anyNamed('data'),
-        ),
-      ).thenAnswer(
+      when(mockDio.put('/account', data: anyNamed('data'))).thenAnswer(
         (_) async => Response(
           requestOptions: RequestOptions(path: '/account'),
           statusCode: 200,
@@ -145,9 +133,7 @@ void main() {
       // Assert
       expect(result, isA<Account>());
       expect(result.moniker, 'Updated Moniker');
-      verify(
-        mockDio.put('/account', data: anyNamed('data')),
-      ).called(1);
+      verify(mockDio.put('/account', data: anyNamed('data'))).called(1);
     });
 
     test('deleteAccount should complete successfully', () async {

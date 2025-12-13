@@ -5,10 +5,7 @@ void main() {
   group('User Model Tests', () {
     test('should create User from JSON', () {
       // Arrange
-      final json = {
-        'username': 'brian',
-        'email': 'brian@example.com',
-      };
+      final json = {'username': 'brian', 'email': 'brian@example.com'};
 
       // Act
       final user = User.fromJson(json);
@@ -20,10 +17,7 @@ void main() {
 
     test('should convert User to JSON', () {
       // Arrange
-      final user = User(
-        username: 'brian',
-        email: 'brian@example.com',
-      );
+      final user = User(username: 'brian', email: 'brian@example.com');
 
       // Act
       final json = user.toJson();
@@ -44,10 +38,7 @@ void main() {
 
     test('should create User copy with updated values', () {
       // Arrange
-      final original = User(
-        username: 'brian',
-        email: 'brian@example.com',
-      );
+      final original = User(username: 'brian', email: 'brian@example.com');
 
       // Act
       final updated = original.copyWith(email: 'newemail@example.com');
@@ -60,20 +51,11 @@ void main() {
 
     test('should compare User equality correctly', () {
       // Arrange
-      final user1 = User(
-        username: 'brian',
-        email: 'brian@example.com',
-      );
+      final user1 = User(username: 'brian', email: 'brian@example.com');
 
-      final user2 = User(
-        username: 'brian',
-        email: 'brian@example.com',
-      );
+      final user2 = User(username: 'brian', email: 'brian@example.com');
 
-      final user3 = User(
-        username: 'different',
-        email: 'brian@example.com',
-      );
+      final user3 = User(username: 'different', email: 'brian@example.com');
 
       // Assert
       expect(user1, equals(user2));

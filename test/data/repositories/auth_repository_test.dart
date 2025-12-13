@@ -22,17 +22,13 @@ void main() {
   group('AuthRepository Tests', () {
     test('login should return AuthToken on success', () async {
       // Arrange
-      final request = LoginRequest(username: 'testuser', password: 'password123');
-      final responseData = {
-        'token': 'test-jwt-token',
-      };
+      final request = LoginRequest(
+        username: 'testuser',
+        password: 'password123',
+      );
+      final responseData = {'token': 'test-jwt-token'};
 
-      when(
-        mockDio.post(
-          '/login',
-          data: anyNamed('data'),
-        ),
-      ).thenAnswer(
+      when(mockDio.post('/login', data: anyNamed('data'))).thenAnswer(
         (_) async => Response(
           requestOptions: RequestOptions(path: '/login'),
           statusCode: 200,
@@ -46,24 +42,17 @@ void main() {
       // Assert
       expect(result, isA<AuthToken>());
       expect(result.token, 'test-jwt-token');
-      verify(
-        mockDio.post(
-          '/login',
-          data: anyNamed('data'),
-        ),
-      ).called(1);
+      verify(mockDio.post('/login', data: anyNamed('data'))).called(1);
     });
 
     test('login should throw exception on failure', () async {
       // Arrange
-      final request = LoginRequest(username: 'testuser', password: 'wrongpassword');
+      final request = LoginRequest(
+        username: 'testuser',
+        password: 'wrongpassword',
+      );
 
-      when(
-        mockDio.post(
-          '/login',
-          data: anyNamed('data'),
-        ),
-      ).thenThrow(
+      when(mockDio.post('/login', data: anyNamed('data'))).thenThrow(
         DioException(
           requestOptions: RequestOptions(path: '/login'),
           response: Response(
@@ -75,10 +64,7 @@ void main() {
       );
 
       // Act & Assert
-      expect(
-        () => authRepository.login(request),
-        throwsA(isA<Exception>()),
-      );
+      expect(() => authRepository.login(request), throwsA(isA<Exception>()));
     });
 
     test('getCurrentUser should return User on success', () async {
