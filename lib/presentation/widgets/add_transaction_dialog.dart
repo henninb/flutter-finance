@@ -290,7 +290,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
 
                 // Transaction state dropdown
                 DropdownButtonFormField<String>(
-                  value: _transactionState,
+                  initialValue: _transactionState,
                   decoration: const InputDecoration(
                     labelText: 'State *',
                     prefixIcon: Icon(Icons.flag),

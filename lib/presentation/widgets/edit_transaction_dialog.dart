@@ -291,7 +291,7 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
 
                 // Transaction type dropdown
                 DropdownButtonFormField<String>(
-                  value: _transactionType,
+                  initialValue: _transactionType,
                   decoration: const InputDecoration(
                     labelText: 'Type *',
                     prefixIcon: Icon(Icons.swap_vert),
@@ -332,7 +332,7 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
 
                 // Transaction state dropdown
                 DropdownButtonFormField<String>(
-                  value: _transactionState,
+                  initialValue: _transactionState,
                   decoration: const InputDecoration(
                     labelText: 'State *',
                     prefixIcon: Icon(Icons.flag),
@@ -420,6 +420,10 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
           ),
           TextButton(
             onPressed: () async {
+              // Capture context-dependent objects before async gap
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+
               Navigator.pop(dialogContext); // Close confirmation dialog
               try {
                 await ref
@@ -429,24 +433,22 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                 // Invalidate totals to refresh them
                 ref.invalidate(transactionTotalsProvider(widget.accountNameOwner));
 
-                if (mounted) {
-                  Navigator.pop(context); // Close edit dialog
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Transaction deleted successfully'),
-                      backgroundColor: AppColors.success,
-                    ),
-                  );
-                }
+                if (!mounted) return;
+                navigator.pop(); // Close edit dialog
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Transaction deleted successfully'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
               } catch (e) {
-                if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to delete transaction: $e'),
-                      backgroundColor: AppColors.error,
-                    ),
-                  );
-                }
+                if (!mounted) return;
+                scaffoldMessenger.showSnackBar(
+                  SnackBar(
+                    content: Text('Failed to delete transaction: $e'),
+                    backgroundColor: AppColors.error,
+                  ),
+                );
               }
             },
             child: const Text(
