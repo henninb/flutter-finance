@@ -38,7 +38,7 @@ dependencies:
   intl: ^0.20.2
   logger: ^2.4.0
   uuid: ^4.4.2
-  equatable: ^2.0.5
+  equatable: ^2.0.8
 
   # Icons
   cupertino_icons: ^1.0.8
