@@ -14,7 +14,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
 
   # Networking
-  dio: ^5.4.3+1
+  dio: ^5.9.1
   pretty_dio_logger: ^1.4.0
   cookie_jar: ^4.0.8
   dio_cookie_manager: ^3.1.1
@@ -38,7 +38,7 @@ dependencies:
   intl: ^0.20.2
   logger: ^2.4.0
   uuid: ^4.4.2
-  equatable: ^2.0.5
+  equatable: ^2.0.8
 
   # Icons
   cupertino_icons: ^1.0.8
@@ -51,8 +51,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
   # Testing
-  mockito: ^5.4.4
-  build_runner: ^2.4.13
+  mockito: ^5.6.3
+  build_runner: ^2.10.5
 
 flutter:
   uses-material-design: true
