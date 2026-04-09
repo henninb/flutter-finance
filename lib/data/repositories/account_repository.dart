@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../data_sources/remote/dio_provider.dart';
 import '../models/account_model.dart';
+import '../../core/utils/formatters.dart';
 
 /// Logger instance
 final _logger = Logger();
@@ -106,7 +107,10 @@ class AccountRepository {
     );
 
     try {
-      final response = await _dio.put('/account', data: account.toJson());
+      final response = await _dio.put(
+        '/account/${account.accountNameOwner}',
+        data: account.toJson(),
+      );
 
       _logger.d('📥 AccountRepository: Response: ${response.data}');
 
@@ -147,14 +151,6 @@ class AccountRepository {
     }
   }
 
-  /// Helper method to parse double from dynamic value (handles both string and number)
-  double _parseDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
   /// Fetch account totals
   Future<Map<String, double>> fetchTotals() async {
     _logger.i('💰 AccountRepository: Fetching account totals');
@@ -164,10 +160,10 @@ class AccountRepository {
       _logger.d('📥 AccountRepository: Response: ${response.data}');
 
       final totals = {
-        'totals': _parseDouble(response.data['totals']),
-        'totalsCleared': _parseDouble(response.data['totalsCleared']),
-        'totalsOutstanding': _parseDouble(response.data['totalsOutstanding']),
-        'totalsFuture': _parseDouble(response.data['totalsFuture']),
+        'totals': Formatters.parseDouble(response.data['totals']),
+        'totalsCleared': Formatters.parseDouble(response.data['totalsCleared']),
+        'totalsOutstanding': Formatters.parseDouble(response.data['totalsOutstanding']),
+        'totalsFuture': Formatters.parseDouble(response.data['totalsFuture']),
       };
 
       _logger.i(

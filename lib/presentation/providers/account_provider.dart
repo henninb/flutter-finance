@@ -88,9 +88,10 @@ final accountsProvider =
       return AccountsNotifier(repository);
     });
 
-/// Provider for account totals
+/// Provider for account totals — recomputes whenever accounts are mutated
 final accountTotalsProvider = FutureProvider<Map<String, double>>((ref) async {
   _logger.i('💰 AccountTotalsProvider: Fetching totals');
+  ref.watch(accountsProvider);
   final repository = ref.watch(accountRepositoryProvider);
   return await repository.fetchTotals();
 });

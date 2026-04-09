@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import '../data_sources/remote/dio_provider.dart';
 import '../models/transaction_model.dart';
+import '../../core/utils/formatters.dart';
 
 /// Logger instance
 final _logger = Logger();
@@ -187,14 +188,6 @@ class TransactionRepository {
     }
   }
 
-  /// Helper method to parse double from dynamic value (handles both string and number)
-  double _parseDouble(dynamic value) {
-    if (value == null) return 0.0;
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
-  }
-
   /// Generate a new UUID for transaction
   Future<String> generateUuid() async {
     _logger.i('🆔 TransactionRepository: Generating UUID');
@@ -232,10 +225,10 @@ class TransactionRepository {
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
       final totals = {
-        'totals': _parseDouble(response.data['totals']),
-        'totalsCleared': _parseDouble(response.data['totalsCleared']),
-        'totalsOutstanding': _parseDouble(response.data['totalsOutstanding']),
-        'totalsFuture': _parseDouble(response.data['totalsFuture']),
+        'totals': Formatters.parseDouble(response.data['totals']),
+        'totalsCleared': Formatters.parseDouble(response.data['totalsCleared']),
+        'totalsOutstanding': Formatters.parseDouble(response.data['totalsOutstanding']),
+        'totalsFuture': Formatters.parseDouble(response.data['totalsFuture']),
       };
 
       _logger.i(
