@@ -46,3 +46,6 @@ app.*.map.json
 
 # Keystore properties
 /android/key.properties
+
+# Claude Code local settings
+.claude/settings.local.json
