@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 /// Transaction model
 class Transaction extends Equatable {
   final int? transactionId;
+  final int? receiptImageId;
   final String guid;
   final int? accountId;
   final String accountNameOwner;
@@ -19,6 +20,7 @@ class Transaction extends Equatable {
 
   const Transaction({
     this.transactionId,
+    this.receiptImageId,
     required this.guid,
     this.accountId,
     required this.accountNameOwner,
@@ -38,6 +40,7 @@ class Transaction extends Equatable {
   factory Transaction.fromJson(Map<String, dynamic> json) {
     return Transaction(
       transactionId: json['transactionId'] as int?,
+      receiptImageId: json['receiptImageId'] as int?,
       guid: json['guid'] as String,
       accountId: json['accountId'] as int?,
       accountNameOwner: json['accountNameOwner'] as String,
@@ -58,6 +61,7 @@ class Transaction extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       if (transactionId != null) 'transactionId': transactionId,
+      if (receiptImageId != null) 'receiptImageId': receiptImageId,
       'guid': guid,
       if (accountId != null) 'accountId': accountId,
       'accountNameOwner': accountNameOwner,
@@ -79,6 +83,7 @@ class Transaction extends Equatable {
   /// Copy with method
   Transaction copyWith({
     int? transactionId,
+    int? receiptImageId,
     String? guid,
     int? accountId,
     String? accountNameOwner,
@@ -95,6 +100,7 @@ class Transaction extends Equatable {
   }) {
     return Transaction(
       transactionId: transactionId ?? this.transactionId,
+      receiptImageId: receiptImageId ?? this.receiptImageId,
       guid: guid ?? this.guid,
       accountId: accountId ?? this.accountId,
       accountNameOwner: accountNameOwner ?? this.accountNameOwner,
@@ -114,6 +120,7 @@ class Transaction extends Equatable {
   @override
   List<Object?> get props => [
     transactionId,
+    receiptImageId,
     guid,
     accountId,
     accountNameOwner,

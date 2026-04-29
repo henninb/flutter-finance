@@ -121,8 +121,15 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
     });
 
     try {
+      final currentReceiptImage = widget.transaction.transactionId == null
+          ? null
+          : ref
+                .read(receiptImagesProvider)
+                .byTransactionId[widget.transaction.transactionId!];
+
       // Create updated transaction with same guid
       final updatedTransaction = widget.transaction.copyWith(
+        receiptImageId: currentReceiptImage?.receiptImageId,
         description: _descriptionController.text.trim(),
         category: _categoryController.text.trim().toLowerCase(),
         amount: double.parse(_amountController.text),
@@ -447,17 +454,18 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
     final transactionId = widget.transaction.transactionId;
     if (transactionId == null) return const SizedBox.shrink();
 
-    final receiptImage =
-        ref.watch(receiptImagesProvider).byTransactionId[transactionId];
+    final receiptImage = ref
+        .watch(receiptImagesProvider)
+        .byTransactionId[transactionId];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
           'Receipt Image',
-          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleSmall?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: 8),
         if (_isImageLoading)
@@ -495,10 +503,12 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                 onPressed: _isSubmitting
                     ? null
                     : () => _confirmDeleteImage(context, ref, transactionId),
-                icon: Icon(Icons.delete_outline,
-                    size: 16, color: AppColors.error),
-                label: Text('Remove',
-                    style: TextStyle(color: AppColors.error)),
+                icon: Icon(
+                  Icons.delete_outline,
+                  size: 16,
+                  color: AppColors.error,
+                ),
+                label: Text('Remove', style: TextStyle(color: AppColors.error)),
               ),
             ],
           )
@@ -539,7 +549,11 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
               onTap: () {
                 Navigator.pop(sheetContext);
                 _pickAndUpload(
-                    context, ref, transactionId, ImageSource.gallery);
+                  context,
+                  ref,
+                  transactionId,
+                  ImageSource.gallery,
+                );
               },
             ),
           ],
@@ -563,7 +577,11 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
       final processed = await compute(processReceiptImage, rawBytes);
       await ref
           .read(receiptImagesProvider.notifier)
-          .uploadForTransaction(transactionId, widget.transaction.guid, processed[0]);
+          .uploadForTransaction(
+            transactionId,
+            widget.transaction.guid,
+            processed[0],
+          );
 
       if (mounted) {
         messenger.showSnackBar(
@@ -597,7 +615,8 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Remove Receipt Image'),
         content: const Text(
-            'Are you sure you want to remove this receipt image?'),
+          'Are you sure you want to remove this receipt image?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),

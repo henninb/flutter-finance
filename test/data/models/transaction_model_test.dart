@@ -6,6 +6,8 @@ void main() {
     test('should create Transaction from JSON', () {
       // Arrange
       final json = {
+        'transactionId': 42,
+        'receiptImageId': 9,
         'guid': '123e4567-e89b-12d3-a456-426614174000',
         'accountNameOwner': 'chase_brian',
         'accountType': 'credit',
@@ -24,6 +26,8 @@ void main() {
       final transaction = Transaction.fromJson(json);
 
       // Assert
+      expect(transaction.transactionId, 42);
+      expect(transaction.receiptImageId, 9);
       expect(transaction.guid, '123e4567-e89b-12d3-a456-426614174000');
       expect(transaction.accountNameOwner, 'chase_brian');
       expect(transaction.description, 'Grocery Store');
@@ -36,6 +40,8 @@ void main() {
     test('should convert Transaction to JSON', () {
       // Arrange
       final transaction = Transaction(
+        transactionId: 42,
+        receiptImageId: 9,
         guid: '123e4567-e89b-12d3-a456-426614174000',
         accountNameOwner: 'chase_brian',
         accountType: 'credit',
@@ -51,6 +57,8 @@ void main() {
       final json = transaction.toJson();
 
       // Assert
+      expect(json['transactionId'], 42);
+      expect(json['receiptImageId'], 9);
       expect(json['guid'], '123e4567-e89b-12d3-a456-426614174000');
       expect(json['description'], 'Grocery Store');
       expect(json['amount'], 50.75);
@@ -81,6 +89,7 @@ void main() {
     test('should create Transaction copy with updated values', () {
       // Arrange
       final original = Transaction(
+        receiptImageId: 9,
         guid: 'test-guid',
         accountNameOwner: 'test_account',
         accountType: 'checking',
@@ -97,6 +106,7 @@ void main() {
       // Assert
       expect(updated.description, 'Updated');
       expect(updated.amount, 200.0);
+      expect(updated.receiptImageId, 9);
       expect(updated.guid, original.guid);
       expect(original.description, 'Original'); // Original unchanged
     });
