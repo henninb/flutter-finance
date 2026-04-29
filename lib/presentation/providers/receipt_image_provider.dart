@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:equatable/equatable.dart';
@@ -80,22 +79,16 @@ class ReceiptImagesNotifier extends StateNotifier<ReceiptImagesState> {
 
   Future<void> uploadForTransaction(
     int transactionId,
+    String guid,
     Uint8List imageBytes,
-    Uint8List thumbBytes,
   ) async {
-    final entity = ReceiptImage(
-      receiptImageId: 0,
-      owner: '',
-      transactionId: transactionId,
-      imageFormatType: 'png',
-      image: base64Encode(imageBytes),
-      thumbnail: base64Encode(thumbBytes),
-    );
-    final created = await _repo.create(entity);
+    final created = await _repo.uploadForTransaction(guid, imageBytes);
+    // Optimistically update local state so the thumbnail appears immediately.
     final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
     updated[transactionId] = created;
     state = state.copyWith(byTransactionId: updated);
     _log.i('✅ Receipt image uploaded for transaction $transactionId');
+    await loadAll();
   }
 
   Future<void> deleteForTransaction(int transactionId) async {

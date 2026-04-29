@@ -563,7 +563,7 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
       final processed = await compute(processReceiptImage, rawBytes);
       await ref
           .read(receiptImagesProvider.notifier)
-          .uploadForTransaction(transactionId, processed[0], processed[1]);
+          .uploadForTransaction(transactionId, widget.transaction.guid, processed[0]);
 
       if (mounted) {
         messenger.showSnackBar(

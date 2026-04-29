@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data_sources/remote/dio_provider.dart';
@@ -15,10 +18,14 @@ class ReceiptImageRepository {
         .toList();
   }
 
-  Future<ReceiptImage> create(ReceiptImage receiptImage) async {
-    final response = await _dio.post(
-      '/receipt/image',
-      data: receiptImage.toJson(),
+  Future<ReceiptImage> uploadForTransaction(
+    String guid,
+    Uint8List imageBytes,
+  ) async {
+    final response = await _dio.put(
+      '/transaction/update/receipt/image/$guid',
+      data: base64Encode(imageBytes),
+      options: Options(contentType: 'text/plain'),
     );
     return ReceiptImage.fromJson(response.data as Map<String, dynamic>);
   }

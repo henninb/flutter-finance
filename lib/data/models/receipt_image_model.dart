@@ -33,8 +33,8 @@ class ReceiptImage extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      'receiptImageId': receiptImageId,
-      'owner': owner,
+      if (receiptImageId != 0) 'receiptImageId': receiptImageId,
+      if (owner.isNotEmpty) 'owner': owner,
       'transactionId': transactionId,
       'activeStatus': activeStatus,
       'imageFormatType': imageFormatType,
