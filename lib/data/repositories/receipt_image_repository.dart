@@ -1,0 +1,34 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data_sources/remote/dio_provider.dart';
+import '../models/receipt_image_model.dart';
+
+class ReceiptImageRepository {
+  final Dio _dio;
+
+  ReceiptImageRepository(this._dio);
+
+  Future<List<ReceiptImage>> getAllActive() async {
+    final response = await _dio.get('/receipt/image/active');
+    return (response.data as List)
+        .map((e) => ReceiptImage.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<ReceiptImage> create(ReceiptImage receiptImage) async {
+    final response = await _dio.post(
+      '/receipt/image',
+      data: receiptImage.toJson(),
+    );
+    return ReceiptImage.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  Future<void> deleteById(int id) async {
+    await _dio.delete('/receipt/image/$id');
+  }
+}
+
+final receiptImageRepositoryProvider = Provider<ReceiptImageRepository>((ref) {
+  final dio = ref.watch(dioProvider);
+  return ReceiptImageRepository(dio);
+});

@@ -1,9 +1,14 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/formatters.dart';
 import '../../data/models/transaction_model.dart';
+import '../providers/receipt_image_provider.dart';
 import '../providers/transaction_provider.dart';
 
 class EditTransactionDialog extends ConsumerStatefulWidget {
@@ -32,6 +37,8 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
   late String _transactionState;
   late String _transactionType;
   bool _isSubmitting = false;
+  bool _isImageLoading = false;
+  final _imagePicker = ImagePicker();
 
   // Common transaction categories
   final List<String> _categories = [
@@ -391,6 +398,10 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
                   maxLines: 3,
                   textInputAction: TextInputAction.done,
                 ),
+                const SizedBox(height: 16),
+
+                // Receipt image section
+                _buildReceiptImageSection(context, ref),
                 const SizedBox(height: 24),
 
                 // Save button
@@ -427,6 +438,227 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReceiptImageSection(BuildContext context, WidgetRef ref) {
+    final transactionId = widget.transaction.transactionId;
+    if (transactionId == null) return const SizedBox.shrink();
+
+    final receiptImage =
+        ref.watch(receiptImagesProvider).byTransactionId[transactionId];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Receipt Image',
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+        ),
+        const SizedBox(height: 8),
+        if (_isImageLoading)
+          const Center(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          )
+        else if (receiptImage != null)
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showFullImage(context, receiptImage.image),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(
+                    base64Decode(receiptImage.thumbnail),
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              TextButton.icon(
+                onPressed: _isSubmitting
+                    ? null
+                    : () => _showFullImage(context, receiptImage.image),
+                icon: const Icon(Icons.visibility, size: 16),
+                label: const Text('View'),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: _isSubmitting
+                    ? null
+                    : () => _confirmDeleteImage(context, ref, transactionId),
+                icon: Icon(Icons.delete_outline,
+                    size: 16, color: AppColors.error),
+                label: Text('Remove',
+                    style: TextStyle(color: AppColors.error)),
+              ),
+            ],
+          )
+        else
+          OutlinedButton.icon(
+            onPressed: _isSubmitting
+                ? null
+                : () => _showImageSourcePicker(context, ref, transactionId),
+            icon: const Icon(Icons.add_a_photo_outlined),
+            label: const Text('Add Receipt Image'),
+          ),
+      ],
+    );
+  }
+
+  void _showImageSourcePicker(
+    BuildContext context,
+    WidgetRef ref,
+    int transactionId,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take Photo'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _pickAndUpload(context, ref, transactionId, ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Choose from Gallery'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                _pickAndUpload(
+                    context, ref, transactionId, ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickAndUpload(
+    BuildContext context,
+    WidgetRef ref,
+    int transactionId,
+    ImageSource source,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final file = await _imagePicker.pickImage(source: source);
+    if (file == null || !mounted) return;
+    setState(() => _isImageLoading = true);
+    try {
+      final rawBytes = await file.readAsBytes();
+      final processed = await compute(processReceiptImage, rawBytes);
+      await ref
+          .read(receiptImagesProvider.notifier)
+          .uploadForTransaction(transactionId, processed[0], processed[1]);
+
+      if (mounted) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Receipt image uploaded'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        messenger.showSnackBar(
+          SnackBar(
+            content: Text('Failed to upload image: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isImageLoading = false);
+    }
+  }
+
+  void _confirmDeleteImage(
+    BuildContext context,
+    WidgetRef ref,
+    int transactionId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Remove Receipt Image'),
+        content: const Text(
+            'Are you sure you want to remove this receipt image?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              final messenger = ScaffoldMessenger.of(context);
+              setState(() => _isImageLoading = true);
+              try {
+                await ref
+                    .read(receiptImagesProvider.notifier)
+                    .deleteForTransaction(transactionId);
+              } catch (e) {
+                if (mounted) {
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to remove image: $e'),
+                      backgroundColor: AppColors.error,
+                    ),
+                  );
+                }
+              } finally {
+                if (mounted) setState(() => _isImageLoading = false);
+              }
+            },
+            child: const Text(
+              'Remove',
+              style: TextStyle(color: AppColors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFullImage(BuildContext context, String base64Image) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.memory(
+                  base64Decode(base64Image),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(dialogContext),
+              ),
+            ),
+          ],
         ),
       ),
     );

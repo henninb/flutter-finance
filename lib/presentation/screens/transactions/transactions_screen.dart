@@ -1,24 +1,44 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/formatters.dart';
 import '../../../data/models/account_model.dart';
 import '../../../data/models/transaction_model.dart';
+import '../../providers/receipt_image_provider.dart';
 import '../../providers/transaction_provider.dart';
 import '../../widgets/transaction_totals_card.dart';
 import '../../widgets/add_transaction_dialog.dart';
 import '../../widgets/edit_transaction_dialog.dart';
 
-class TransactionsScreen extends ConsumerWidget {
+class TransactionsScreen extends ConsumerStatefulWidget {
   final Account account;
 
   const TransactionsScreen({super.key, required this.account});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TransactionsScreen> createState() =>
+      _TransactionsScreenState();
+}
+
+class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
+  Account get account => widget.account;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(receiptImagesProvider.notifier).loadAll();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final transactionsState = ref.watch(
       transactionsProvider(account.accountNameOwner),
     );
+    final receiptImages = ref.watch(receiptImagesProvider).byTransactionId;
 
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +66,8 @@ class TransactionsScreen extends ConsumerWidget {
             ? const Center(child: CircularProgressIndicator())
             : transactionsState.errorMessage != null
             ? _buildErrorView(context, ref, transactionsState.errorMessage!)
-            : _buildTransactionsList(context, ref, transactionsState),
+            : _buildTransactionsList(
+                context, ref, transactionsState, receiptImages),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -62,6 +83,7 @@ class TransactionsScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     transactionsState,
+    Map<int, dynamic> receiptImages,
   ) {
     final paginatedTransactions = transactionsState.paginatedTransactions;
     final allTransactions = transactionsState.allTransactions;
@@ -90,7 +112,8 @@ class TransactionsScreen extends ConsumerWidget {
               }
 
               final transaction = paginatedTransactions[index - 1];
-              return _buildTransactionCard(context, ref, transaction);
+              return _buildTransactionCard(
+                  context, ref, transaction, receiptImages);
             },
           ),
         ),
@@ -201,25 +224,44 @@ class TransactionsScreen extends ConsumerWidget {
     BuildContext context,
     WidgetRef ref,
     Transaction transaction,
+    Map<int, dynamic> receiptImages,
   ) {
     final stateColor = _getStateColor(transaction.transactionState);
     final isCredit = transaction.accountType == 'credit';
     final displayAmount = isCredit ? -transaction.amount : transaction.amount;
+    final receiptImage = transaction.transactionId != null
+        ? receiptImages[transaction.transactionId]
+        : null;
 
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: stateColor.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            _getTransactionIcon(transaction.category),
-            color: stateColor,
+        leading: GestureDetector(
+          onTap: receiptImage != null
+              ? () => _showFullImage(context, receiptImage.image as String)
+              : null,
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: stateColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: receiptImage != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.memory(
+                      base64Decode(receiptImage.thumbnail as String),
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    ),
+                  )
+                : Icon(
+                    _getTransactionIcon(transaction.category),
+                    color: stateColor,
+                  ),
           ),
         ),
         title: Text(
@@ -287,6 +329,35 @@ class TransactionsScreen extends ConsumerWidget {
           ),
         ),
         onTap: () => _showEditTransactionDialog(context, ref, transaction),
+      ),
+    );
+  }
+
+  void _showFullImage(BuildContext context, String base64Image) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.black,
+        child: Stack(
+          children: [
+            Center(
+              child: InteractiveViewer(
+                child: Image.memory(
+                  base64Decode(base64Image),
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            Positioned(
+              top: 8,
+              right: 8,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white),
+                onPressed: () => Navigator.pop(dialogContext),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
