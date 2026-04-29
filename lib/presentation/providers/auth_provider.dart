@@ -66,19 +66,19 @@ class AuthNotifier extends StateNotifier<AuthState> {
         if (token != null) {
           _logger.i('✅ AuthNotifier: Valid token found, fetching user info');
 
-          // Check if we have a CSRF token, if not fetch it
-          final csrfToken = await _secureStorage.getCsrfToken();
-          if (csrfToken == null) {
-            _logger.d('🔒 AuthNotifier: No CSRF token found, fetching...');
-            try {
-              final newCsrfToken = await _authRepository.fetchCsrfToken();
-              await _secureStorage.saveCsrfToken(newCsrfToken);
-              _logger.i('✅ AuthNotifier: CSRF token fetched and saved');
-            } catch (csrfError) {
-              _logger.w(
-                '⚠️ AuthNotifier: Failed to fetch CSRF token on startup: $csrfError',
-              );
-            }
+          // Always re-fetch CSRF token on startup so the XSRF-TOKEN cookie
+          // gets written into the in-memory CookieJar for this session.
+          // Skipping this when the token is already in secure storage causes
+          // the first mutation after an app restart to fail with 403, because
+          // the cookie jar is empty and the server can't validate the header.
+          try {
+            final newCsrfToken = await _authRepository.fetchCsrfToken();
+            await _secureStorage.saveCsrfToken(newCsrfToken);
+            _logger.i('✅ AuthNotifier: CSRF token refreshed on startup');
+          } catch (csrfError) {
+            _logger.w(
+              '⚠️ AuthNotifier: Failed to refresh CSRF token on startup: $csrfError',
+            );
           }
 
           // Set token in dio headers (this will be done via interceptor)
