@@ -91,10 +91,9 @@ class ReceiptImagesNotifier extends StateNotifier<ReceiptImagesState> {
     await loadAll();
   }
 
-  Future<void> deleteForTransaction(int transactionId) async {
-    final existing = state.byTransactionId[transactionId];
-    if (existing == null) return;
-    await _repo.deleteById(existing.receiptImageId);
+  Future<void> deleteForTransaction(int transactionId, String guid) async {
+    if (state.byTransactionId[transactionId] == null) return;
+    await _repo.deleteForTransaction(guid);
     final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
     updated.remove(transactionId);
     state = state.copyWith(byTransactionId: updated);

@@ -30,8 +30,8 @@ class ReceiptImageRepository {
     return ReceiptImage.fromJson(response.data as Map<String, dynamic>);
   }
 
-  Future<void> deleteById(int id) async {
-    await _dio.delete('/receipt/image/$id');
+  Future<void> deleteForTransaction(String guid) async {
+    await _dio.delete('/transaction/receipt/image/$guid');
   }
 }
 

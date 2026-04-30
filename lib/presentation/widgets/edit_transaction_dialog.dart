@@ -630,7 +630,7 @@ class _EditTransactionDialogState extends ConsumerState<EditTransactionDialog> {
               try {
                 await ref
                     .read(receiptImagesProvider.notifier)
-                    .deleteForTransaction(transactionId);
+                    .deleteForTransaction(transactionId, widget.transaction.guid);
               } catch (e) {
                 if (mounted) {
                   messenger.showSnackBar(
