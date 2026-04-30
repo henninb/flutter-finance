@@ -196,7 +196,10 @@ class TransactionRepository {
       final response = await _dio.post('/uuid/generate');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final uuid = response.data['uuid'] as String;
+      final uuid = response.data['uuid'] as String?;
+      if (uuid == null || uuid.isEmpty) {
+        throw Exception('Server returned empty UUID');
+      }
       _logger.i('✅ TransactionRepository: Generated UUID: $uuid');
 
       return uuid;

@@ -1,5 +1,14 @@
 import 'package:equatable/equatable.dart';
 
+DateTime? _parseValidationDate(Object? value) {
+  if (value == null) return null;
+  try {
+    return DateTime.parse(value as String);
+  } on FormatException {
+    return null;
+  }
+}
+
 /// Account model
 class Account extends Equatable {
   final int? accountId;
@@ -38,9 +47,7 @@ class Account extends Equatable {
       outstanding: (json['outstanding'] as num?)?.toDouble() ?? 0.0,
       future: (json['future'] as num?)?.toDouble() ?? 0.0,
       activeStatus: json['activeStatus'] as bool? ?? true,
-      validationDate: json['validationDate'] != null
-          ? DateTime.parse(json['validationDate'] as String)
-          : null,
+      validationDate: _parseValidationDate(json['validationDate']),
     );
   }
 

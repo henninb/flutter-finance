@@ -1,5 +1,14 @@
 import 'package:equatable/equatable.dart';
 
+DateTime _parseDate(Object? value) {
+  if (value == null) return DateTime.now();
+  try {
+    return DateTime.parse(value as String);
+  } on FormatException {
+    return DateTime.now();
+  }
+}
+
 /// Transaction model
 class Transaction extends Equatable {
   final int? transactionId;
@@ -45,10 +54,10 @@ class Transaction extends Equatable {
       accountId: json['accountId'] as int?,
       accountNameOwner: json['accountNameOwner'] as String,
       accountType: json['accountType'] as String,
-      transactionDate: DateTime.parse(json['transactionDate'] as String),
+      transactionDate: _parseDate(json['transactionDate']),
       description: json['description'] as String,
       category: json['category'] as String,
-      amount: (json['amount'] as num).toDouble(),
+      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
       transactionState: json['transactionState'] as String,
       transactionType: json['transactionType'] as String? ?? 'expense',
       reoccurringType: json['reoccurringType'] as String? ?? 'onetime',

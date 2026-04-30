@@ -82,22 +82,39 @@ class ReceiptImagesNotifier extends StateNotifier<ReceiptImagesState> {
     String guid,
     Uint8List imageBytes,
   ) async {
-    final created = await _repo.uploadForTransaction(guid, imageBytes);
-    // Optimistically update local state so the thumbnail appears immediately.
-    final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
-    updated[transactionId] = created;
-    state = state.copyWith(byTransactionId: updated);
-    _log.i('✅ Receipt image uploaded for transaction $transactionId');
-    await loadAll();
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final created = await _repo.uploadForTransaction(guid, imageBytes);
+      // Optimistically update local state so the thumbnail appears immediately.
+      final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
+      updated[transactionId] = created;
+      state = state.copyWith(isLoading: false, byTransactionId: updated);
+      _log.i('✅ Receipt image uploaded for transaction $transactionId');
+      await loadAll();
+    } catch (e) {
+      _log.e('❌ Failed to upload receipt image for transaction $transactionId',
+          error: e);
+      state = state.copyWith(isLoading: false, error: e.toString());
+      rethrow;
+    }
   }
 
   Future<void> deleteForTransaction(int transactionId, String guid) async {
     if (state.byTransactionId[transactionId] == null) return;
-    await _repo.deleteForTransaction(guid);
-    final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
-    updated.remove(transactionId);
-    state = state.copyWith(byTransactionId: updated);
-    _log.i('🗑️ Receipt image deleted for transaction $transactionId');
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _repo.deleteForTransaction(guid);
+      final updated = Map<int, ReceiptImage>.from(state.byTransactionId);
+      updated.remove(transactionId);
+      state = state.copyWith(isLoading: false, byTransactionId: updated);
+      _log.i('🗑️ Receipt image deleted for transaction $transactionId');
+    } catch (e) {
+      _log.e(
+          '❌ Failed to delete receipt image for transaction $transactionId',
+          error: e);
+      state = state.copyWith(isLoading: false, error: e.toString());
+      rethrow;
+    }
   }
 }
 

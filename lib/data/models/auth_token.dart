@@ -14,10 +14,17 @@ class AuthToken {
   factory AuthToken.fromJson(Map<String, dynamic> json) {
     return AuthToken(
       token: json['token'] as String,
-      expiresAt: json['expiresAt'] != null
-          ? DateTime.parse(json['expiresAt'] as String)
-          : DateTime.now().add(const Duration(hours: 1)),
+      expiresAt: _parseExpiry(json['expiresAt']),
     );
+  }
+
+  static DateTime _parseExpiry(Object? value) {
+    if (value == null) return DateTime.now().add(const Duration(hours: 1));
+    try {
+      return DateTime.parse(value as String);
+    } on FormatException {
+      return DateTime.now().add(const Duration(hours: 1));
+    }
   }
 
   /// Convert to JSON

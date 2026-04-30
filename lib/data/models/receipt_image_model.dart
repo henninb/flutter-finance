@@ -21,13 +21,13 @@ class ReceiptImage extends Equatable {
 
   factory ReceiptImage.fromJson(Map<String, dynamic> json) {
     return ReceiptImage(
-      receiptImageId: (json['receiptImageId'] as num).toInt(),
+      receiptImageId: (json['receiptImageId'] as num?)?.toInt() ?? 0,
       owner: json['owner'] as String? ?? '',
-      transactionId: (json['transactionId'] as num).toInt(),
+      transactionId: (json['transactionId'] as num?)?.toInt() ?? 0,
       activeStatus: json['activeStatus'] as bool? ?? true,
       imageFormatType: json['imageFormatType'] as String? ?? 'png',
-      image: json['image'] as String,
-      thumbnail: json['thumbnail'] as String,
+      image: json['image'] as String? ?? '',
+      thumbnail: json['thumbnail'] as String? ?? '',
     );
   }
 
