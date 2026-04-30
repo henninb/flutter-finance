@@ -120,7 +120,7 @@ class AccountsScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
       child: TextField(
         onChanged: (value) {
-          ref.read(accountSearchQueryProvider.notifier).state = value;
+          ref.read(accountSearchQueryProvider.notifier).update(value);
         },
         decoration: InputDecoration(
           hintText: 'Search accounts...',
@@ -129,7 +129,7 @@ class AccountsScreen extends ConsumerWidget {
               ? IconButton(
                   icon: const Icon(Icons.clear, color: AppColors.textSecondary),
                   onPressed: () {
-                    ref.read(accountSearchQueryProvider.notifier).state = '';
+                    ref.read(accountSearchQueryProvider.notifier).update('');
                   },
                 )
               : null,

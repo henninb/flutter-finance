@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 
 DateTime _parseDate(Object? value) {
   if (value == null) return DateTime.now();
+  if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+  if (value is! String) return DateTime.now();
   try {
-    return DateTime.parse(value as String);
+    return DateTime.parse(value);
   } on FormatException {
     return DateTime.now();
   }
@@ -50,15 +52,15 @@ class Transaction extends Equatable {
     return Transaction(
       transactionId: json['transactionId'] as int?,
       receiptImageId: json['receiptImageId'] as int?,
-      guid: json['guid'] as String,
+      guid: json['guid'] as String? ?? '',
       accountId: json['accountId'] as int?,
-      accountNameOwner: json['accountNameOwner'] as String,
-      accountType: json['accountType'] as String,
+      accountNameOwner: json['accountNameOwner'] as String? ?? '',
+      accountType: json['accountType'] as String? ?? '',
       transactionDate: _parseDate(json['transactionDate']),
-      description: json['description'] as String,
-      category: json['category'] as String,
+      description: json['description'] as String? ?? '',
+      category: json['category'] as String? ?? '',
       amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      transactionState: json['transactionState'] as String,
+      transactionState: json['transactionState'] as String? ?? '',
       transactionType: json['transactionType'] as String? ?? 'expense',
       reoccurringType: json['reoccurringType'] as String? ?? 'onetime',
       activeStatus: json['activeStatus'] as bool? ?? true,

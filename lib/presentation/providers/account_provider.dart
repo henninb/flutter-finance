@@ -7,26 +7,30 @@ import '../../data/repositories/account_repository.dart';
 final _logger = Logger();
 
 /// Account list state notifier
-class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
-  final AccountRepository _repository;
-
-  AccountsNotifier(this._repository) : super(const AsyncValue.loading()) {
-    fetchAccounts();
+class AccountsNotifier extends AsyncNotifier<List<Account>> {
+  @override
+  Future<List<Account>> build() async {
+    _logger.i('📊 AccountsNotifier: Fetching accounts');
+    final accounts =
+        await ref.watch(accountRepositoryProvider).fetchAccounts();
+    _logger.i('✅ AccountsNotifier: Loaded ${accounts.length} accounts');
+    return accounts;
   }
 
-  /// Fetch all accounts
+  /// Fetch all accounts (manual refresh)
   Future<void> fetchAccounts() async {
     _logger.i('📊 AccountsNotifier: Fetching accounts');
     state = const AsyncValue.loading();
-
     state = await AsyncValue.guard(() async {
-      final accounts = await _repository.fetchAccounts();
+      final accounts =
+          await ref.read(accountRepositoryProvider).fetchAccounts();
       _logger.i('✅ AccountsNotifier: Loaded ${accounts.length} accounts');
       return accounts;
     });
-
     if (state.hasError) {
-      _logger.e('❌ AccountsNotifier: Error loading accounts: ${state.error}');
+      _logger.e(
+        '❌ AccountsNotifier: Error loading accounts: ${state.error}',
+      );
     }
   }
 
@@ -37,7 +41,7 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
     );
 
     try {
-      await _repository.createAccount(account);
+      await ref.read(accountRepositoryProvider).createAccount(account);
       _logger.i('✅ AccountsNotifier: Account created, refreshing list');
       await fetchAccounts();
     } catch (e) {
@@ -51,7 +55,7 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
     _logger.i('✏️ AccountsNotifier: Updating account ${account.accountId}');
 
     try {
-      await _repository.updateAccount(account);
+      await ref.read(accountRepositoryProvider).updateAccount(account);
       _logger.i('✅ AccountsNotifier: Account updated, refreshing list');
       await fetchAccounts();
     } catch (e) {
@@ -65,7 +69,7 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
     _logger.i('🗑️ AccountsNotifier: Deleting account $accountNameOwner');
 
     try {
-      await _repository.deleteAccount(accountNameOwner);
+      await ref.read(accountRepositoryProvider).deleteAccount(accountNameOwner);
       _logger.i('✅ AccountsNotifier: Account deleted, refreshing list');
       await fetchAccounts();
     } catch (e) {
@@ -83,10 +87,7 @@ class AccountsNotifier extends StateNotifier<AsyncValue<List<Account>>> {
 
 /// Provider for accounts list
 final accountsProvider =
-    StateNotifierProvider<AccountsNotifier, AsyncValue<List<Account>>>((ref) {
-      final repository = ref.watch(accountRepositoryProvider);
-      return AccountsNotifier(repository);
-    });
+    AsyncNotifierProvider<AccountsNotifier, List<Account>>(AccountsNotifier.new);
 
 /// Provider for account totals — recomputes whenever accounts are mutated
 final accountTotalsProvider = FutureProvider<Map<String, double>>((ref) async {
@@ -131,5 +132,14 @@ final activeAccountsProvider = Provider<List<Account>>((ref) {
   );
 });
 
+/// Simple notifier for the account search query
+class _SearchQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void update(String value) => state = value;
+}
+
 /// Provider for account search query
-final accountSearchQueryProvider = StateProvider<String>((ref) => '');
+final accountSearchQueryProvider =
+    NotifierProvider<_SearchQueryNotifier, String>(_SearchQueryNotifier.new);

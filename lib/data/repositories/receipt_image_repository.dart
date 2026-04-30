@@ -47,6 +47,8 @@ class ReceiptImageRepository {
     String guid,
     Uint8List imageBytes,
   ) async {
+    if (guid.trim().isEmpty) throw ArgumentError('guid must not be empty');
+    if (imageBytes.isEmpty) throw ArgumentError('imageBytes must not be empty');
     _logger.i(
       '📤 ReceiptImageRepository: Uploading receipt image for transaction $guid',
     );
@@ -81,6 +83,7 @@ class ReceiptImageRepository {
   }
 
   Future<void> deleteForTransaction(String guid) async {
+    if (guid.trim().isEmpty) throw ArgumentError('guid must not be empty');
     _logger.i(
       '🗑️ ReceiptImageRepository: Deleting receipt image for transaction $guid',
     );

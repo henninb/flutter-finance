@@ -66,8 +66,11 @@ class ReceiptImage extends Equatable {
   @override
   List<Object?> get props => [
         receiptImageId,
+        owner,
         transactionId,
         activeStatus,
         imageFormatType,
+        image,
+        thumbnail,
       ];
 }

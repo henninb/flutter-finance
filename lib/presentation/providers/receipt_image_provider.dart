@@ -25,6 +25,15 @@ List<Uint8List> processReceiptImage(Uint8List rawBytes) {
     pngBytes = img.encodePng(current);
   }
 
+  // Width guard stopped the loop before hitting the size target; the caller
+  // receives the best effort result.
+  if (pngBytes.length > maxBytes) {
+    Logger().w(
+      '⚠️ processReceiptImage: image still ${pngBytes.length} bytes after '
+      'resize (min width reached). Uploading anyway.',
+    );
+  }
+
   // 150x150 square thumbnail
   final thumb = img.copyResizeCropSquare(decoded, size: 150);
   final thumbBytes = img.encodePng(thumb);
@@ -59,11 +68,15 @@ class ReceiptImagesState extends Equatable {
   List<Object?> get props => [byTransactionId, isLoading, error];
 }
 
-class ReceiptImagesNotifier extends StateNotifier<ReceiptImagesState> {
-  final ReceiptImageRepository _repo;
+class ReceiptImagesNotifier extends Notifier<ReceiptImagesState> {
+  late ReceiptImageRepository _repo;
   final _log = Logger();
 
-  ReceiptImagesNotifier(this._repo) : super(const ReceiptImagesState());
+  @override
+  ReceiptImagesState build() {
+    _repo = ref.watch(receiptImageRepositoryProvider);
+    return const ReceiptImagesState();
+  }
 
   Future<void> loadAll() async {
     state = state.copyWith(isLoading: true, error: null);
@@ -119,7 +132,6 @@ class ReceiptImagesNotifier extends StateNotifier<ReceiptImagesState> {
 }
 
 final receiptImagesProvider =
-    StateNotifierProvider<ReceiptImagesNotifier, ReceiptImagesState>((ref) {
-  final repo = ref.watch(receiptImageRepositoryProvider);
-  return ReceiptImagesNotifier(repo);
-});
+    NotifierProvider<ReceiptImagesNotifier, ReceiptImagesState>(
+      ReceiptImagesNotifier.new,
+    );

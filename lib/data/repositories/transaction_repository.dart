@@ -18,6 +18,9 @@ class TransactionRepository {
   Future<List<Transaction>> fetchTransactionsByAccount(
     String accountNameOwner,
   ) async {
+    if (accountNameOwner.trim().isEmpty) {
+      throw ArgumentError('accountNameOwner must not be empty');
+    }
     _logger.i(
       '📊 TransactionRepository: Fetching transactions for $accountNameOwner',
     );
@@ -30,7 +33,8 @@ class TransactionRepository {
 
       if (response.data is List) {
         final transactions = (response.data as List)
-            .map((json) => Transaction.fromJson(json as Map<String, dynamic>))
+            .whereType<Map<String, dynamic>>()
+            .map(Transaction.fromJson)
             .toList();
 
         _logger.i(
@@ -54,12 +58,16 @@ class TransactionRepository {
 
   /// Fetch transaction by GUID
   Future<Transaction> fetchTransactionByGuid(String guid) async {
+    if (guid.trim().isEmpty) throw ArgumentError('guid must not be empty');
     _logger.i('📊 TransactionRepository: Fetching transaction $guid');
 
     try {
       final response = await _dio.get('/transaction/$guid');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for transaction');
+      }
       final transaction = Transaction.fromJson(
         response.data as Map<String, dynamic>,
       );
@@ -92,6 +100,9 @@ class TransactionRepository {
 
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for created transaction');
+      }
       final createdTransaction = Transaction.fromJson(
         response.data as Map<String, dynamic>,
       );
@@ -125,6 +136,9 @@ class TransactionRepository {
 
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for updated transaction');
+      }
       final updatedTransaction = Transaction.fromJson(
         response.data as Map<String, dynamic>,
       );
@@ -146,6 +160,7 @@ class TransactionRepository {
 
   /// Delete transaction by GUID
   Future<void> deleteTransaction(String guid) async {
+    if (guid.trim().isEmpty) throw ArgumentError('guid must not be empty');
     _logger.i('🗑️ TransactionRepository: Deleting transaction $guid');
 
     try {
@@ -164,6 +179,8 @@ class TransactionRepository {
 
   /// Update transaction state
   Future<Transaction> updateTransactionState(String guid, String state) async {
+    if (guid.trim().isEmpty) throw ArgumentError('guid must not be empty');
+    if (state.trim().isEmpty) throw ArgumentError('state must not be empty');
     _logger.i(
       '🔄 TransactionRepository: Updating transaction $guid state to $state',
     );
@@ -172,6 +189,9 @@ class TransactionRepository {
       final response = await _dio.put('/transaction/state/update/$guid/$state');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for transaction state update');
+      }
       final updatedTransaction = Transaction.fromJson(
         response.data as Map<String, dynamic>,
       );
@@ -196,7 +216,10 @@ class TransactionRepository {
       final response = await _dio.post('/uuid/generate');
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
-      final uuid = response.data['uuid'] as String?;
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for UUID');
+      }
+      final uuid = (response.data as Map<String, dynamic>)['uuid'] as String?;
       if (uuid == null || uuid.isEmpty) {
         throw Exception('Server returned empty UUID');
       }
@@ -217,6 +240,9 @@ class TransactionRepository {
   Future<Map<String, double>> fetchAccountTotals(
     String accountNameOwner,
   ) async {
+    if (accountNameOwner.trim().isEmpty) {
+      throw ArgumentError('accountNameOwner must not be empty');
+    }
     _logger.i(
       '💰 TransactionRepository: Fetching totals for $accountNameOwner',
     );
@@ -227,11 +253,15 @@ class TransactionRepository {
       );
       _logger.d('📥 TransactionRepository: Response: ${response.data}');
 
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format for account totals');
+      }
+      final data = response.data as Map<String, dynamic>;
       final totals = {
-        'totals': Formatters.parseDouble(response.data['totals']),
-        'totalsCleared': Formatters.parseDouble(response.data['totalsCleared']),
-        'totalsOutstanding': Formatters.parseDouble(response.data['totalsOutstanding']),
-        'totalsFuture': Formatters.parseDouble(response.data['totalsFuture']),
+        'totals': Formatters.parseDouble(data['totals']),
+        'totalsCleared': Formatters.parseDouble(data['totalsCleared']),
+        'totalsOutstanding': Formatters.parseDouble(data['totalsOutstanding']),
+        'totalsFuture': Formatters.parseDouble(data['totalsFuture']),
       };
 
       _logger.i(

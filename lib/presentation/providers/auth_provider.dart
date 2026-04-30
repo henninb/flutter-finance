@@ -42,13 +42,16 @@ class AuthState extends Equatable {
 }
 
 /// Authentication state notifier
-class AuthNotifier extends StateNotifier<AuthState> {
-  final AuthRepository _authRepository;
-  final SecureStorageService _secureStorage;
+class AuthNotifier extends Notifier<AuthState> {
+  late AuthRepository _authRepository;
+  late SecureStorageService _secureStorage;
 
-  AuthNotifier(this._authRepository, this._secureStorage)
-    : super(const AuthState()) {
-    _checkAuthStatus();
+  @override
+  AuthState build() {
+    _authRepository = ref.watch(authRepositoryProvider);
+    _secureStorage = ref.watch(secureStorageServiceProvider);
+    Future.microtask(_checkAuthStatus);
+    return const AuthState();
   }
 
   /// Check if user is already authenticated on app start
@@ -173,8 +176,4 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 /// Auth state provider
-final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
-  final authRepository = ref.watch(authRepositoryProvider);
-  final secureStorage = ref.watch(secureStorageServiceProvider);
-  return AuthNotifier(authRepository, secureStorage);
-});
+final authProvider = NotifierProvider<AuthNotifier, AuthState>(AuthNotifier.new);

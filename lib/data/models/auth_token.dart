@@ -12,16 +12,17 @@ class AuthToken {
 
   /// Create AuthToken from JSON
   factory AuthToken.fromJson(Map<String, dynamic> json) {
-    return AuthToken(
-      token: json['token'] as String,
-      expiresAt: _parseExpiry(json['expiresAt']),
-    );
+    final token = json['token'] as String? ?? '';
+    if (token.isEmpty) throw FormatException('AuthToken.fromJson: missing token field');
+    return AuthToken(token: token, expiresAt: _parseExpiry(json['expiresAt']));
   }
 
   static DateTime _parseExpiry(Object? value) {
     if (value == null) return DateTime.now().add(const Duration(hours: 1));
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is! String) return DateTime.now().add(const Duration(hours: 1));
     try {
-      return DateTime.parse(value as String);
+      return DateTime.parse(value);
     } on FormatException {
       return DateTime.now().add(const Duration(hours: 1));
     }

@@ -74,13 +74,17 @@ class TransactionsState extends Equatable {
 }
 
 /// Transaction list state notifier for a specific account
-class TransactionsNotifier extends StateNotifier<TransactionsState> {
-  final TransactionRepository _repository;
+class TransactionsNotifier extends Notifier<TransactionsState> {
   final String accountNameOwner;
+  late TransactionRepository _repository;
 
-  TransactionsNotifier(this._repository, this.accountNameOwner)
-    : super(const TransactionsState(isLoading: true)) {
-    fetchTransactions();
+  TransactionsNotifier(this.accountNameOwner);
+
+  @override
+  TransactionsState build() {
+    _repository = ref.watch(transactionRepositoryProvider);
+    Future.microtask(fetchTransactions);
+    return const TransactionsState(isLoading: true);
   }
 
   /// Fetch all transactions for the account
@@ -188,13 +192,13 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
   }
 
   /// Update transaction state
-  Future<void> updateTransactionState(String guid, String state) async {
+  Future<void> updateTransactionState(String guid, String newState) async {
     _logger.i(
-      '🔄 TransactionsNotifier: Updating transaction $guid state to $state',
+      '🔄 TransactionsNotifier: Updating transaction $guid state to $newState',
     );
 
     try {
-      await _repository.updateTransactionState(guid, state);
+      await _repository.updateTransactionState(guid, newState);
       _logger.i(
         '✅ TransactionsNotifier: Transaction state updated, refreshing list',
       );
@@ -215,15 +219,11 @@ class TransactionsNotifier extends StateNotifier<TransactionsState> {
 }
 
 /// Provider family for transactions by account
-final transactionsProvider =
-    StateNotifierProvider.family<
-      TransactionsNotifier,
-      TransactionsState,
-      String
-    >((ref, accountNameOwner) {
-      final repository = ref.watch(transactionRepositoryProvider);
-      return TransactionsNotifier(repository, accountNameOwner);
-    });
+final transactionsProvider = NotifierProvider.family<
+  TransactionsNotifier,
+  TransactionsState,
+  String
+>((accountNameOwner) => TransactionsNotifier(accountNameOwner));
 
 /// Provider family for transaction totals by account
 final transactionTotalsProvider =

@@ -2,8 +2,10 @@ import 'package:equatable/equatable.dart';
 
 DateTime? _parseValidationDate(Object? value) {
   if (value == null) return null;
+  if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+  if (value is! String) return null;
   try {
-    return DateTime.parse(value as String);
+    return DateTime.parse(value);
   } on FormatException {
     return null;
   }
@@ -40,8 +42,8 @@ class Account extends Equatable {
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
       accountId: json['accountId'] as int?,
-      accountNameOwner: json['accountNameOwner'] as String,
-      accountType: json['accountType'] as String,
+      accountNameOwner: json['accountNameOwner'] as String? ?? '',
+      accountType: json['accountType'] as String? ?? '',
       moniker: json['moniker'] as String?,
       cleared: (json['cleared'] as num?)?.toDouble() ?? 0.0,
       outstanding: (json['outstanding'] as num?)?.toDouble() ?? 0.0,
